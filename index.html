@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bharat OpenSetu | Unified Public Record & Open Data Intelligence Portal</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            saffron: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' },
+            ashoka: { 50: '#eff6ff', 100: '#dbeafe', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a', 950: '#0f172a' },
+            indiaGreen: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
 
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .gov-tricolor-line {
+      background: linear-gradient(90deg, #ff9933 0%, #ff9933 33.3%, #ffffff 33.3%, #ffffff 66.6%, #138808 66.6%, #138808 100%);
+      height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printable-area, #printable-area * { visibility: visible; }
+      #printable-area {
+        position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 24px;
+        background: white !important; color: black !important; display: block !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- Tricolor Top Border -->
+  <div class="gov-tricolor-line w-full sticky top-0 z-50"></div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 max-w-sm px-4 py-3 bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-700 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 pointer-events-none">
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+    <span id="toast-message" class="text-xs sm:text-sm font-medium">Ready</span>
+  </div>
+
+  <!-- API Gateway Modal -->
+  <div id="api-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600">
+            <i data-lucide="key-round" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Live API Gateway Configuration</h3>
+            <p class="text-xs text-slate-500">Connect your own API Setu / Surepass / OGD keys</p>
+          </div>
+        </div>
+        <button onclick="toggleApiModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300">
+          <strong>Note:</strong> Banking (IFSC), Postal (PIN Code), and Road/Highway (OSM/NHAI) modules already connect to <strong>100% Free Live Public APIs</strong> with zero keys required. For regulated KYC databases (RTO Vahan, PAN, GSTIN), you can optionally supply a production proxy URL and Bearer token below.
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Custom Gateway / Proxy Endpoint URL (Optional)</label>
+          <input type="url" id="custom-api-url" placeholder="https://api.apisetu.gov.in or your Cloudflare Worker URL" class="w-full font-mono text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">API Key / Bearer Token (Stored locally in browser)</label>
+          <input type="password" id="custom-api-key" placeholder="Enter your API Setu / Surepass / data.gov.in API Key" class="w-full font-mono text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+        <button onclick="clearApiKeys()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100">Reset to Default</button>
+        <button onclick="saveApiKeys()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">Save Configuration</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-1 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 gap-3">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
+          <div class="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-ashoka-950 via-ashoka-900 to-indigo-950 text-amber-400 shadow-md border border-amber-500/30 shrink-0">
+            <svg class="w-7 h-7 text-amber-400 animate-[spin_60s_linear_infinite]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="12" cy="12" r="9.5"></circle>
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 2.5v6.5M12 15v6.5M2.5 12h6.5M15 12h6.5M5.28 5.28l4.6 4.6M14.12 14.12l4.6 4.6M18.72 5.28l-4.6 4.6M9.88 14.12l-4.6 4.6"></path>
+            </svg>
+            <span class="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-indiaGreen-500 border-2 border-white dark:border-slate-900"></span>
+            </span>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="font-extrabold text-base sm:text-xl tracking-tight text-slate-950 dark:text-white">
+                Bharat OpenSetu — Public Record & Data Portal
+              </h1>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                LIVE REST + SMART DECODER
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Unified Lookup for Banking, Postal, Highways, RTO Vahan, PAN, GSTIN, Insurance & e-KYC
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Controls -->
+        <div class="flex items-center gap-2">
+          <button onclick="toggleApiModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 text-xs font-semibold text-slate-700 dark:text-slate-200 transition">
+            <i data-lucide="settings-2" class="w-4 h-4 text-blue-600"></i>
+            <span class="hidden sm:inline">API Gateway Keys</span>
+          </button>
+
+          <button id="theme-btn" aria-label="Toggle Theme" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            <i id="theme-sun" data-lucide="sun" class="w-4 h-4 hidden"></i>
+            <i id="theme-moon" data-lucide="moon" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Universal Quick Search Bar (Auto-Detects Input Type) -->
+    <div class="bg-gradient-to-r from-slate-900 via-ashoka-950 to-indigo-950 rounded-2xl p-5 sm:p-6 text-white shadow-lg border border-blue-500/20">
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-1.5">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Universal Smart Identifier Search (Auto-Detects Record Type)</span>
+        </div>
+        <p class="text-xs text-blue-100/90 mb-3">
+          Paste any **IFSC Code** (`SBIN0000691`), **PIN Code** (`201301`), **Highway** (`NH44`), **Vehicle RC** (`UP16DB1741`), **PAN** (`ABCDE1234F`), or **GSTIN** (`09AAACP1234C1Z5`) — our engine automatically routes your query.
+        </p>
+        <form onsubmit="handleUniversalSearch(event)" class="flex flex-col sm:flex-row gap-2.5">
+          <div class="relative flex-1">
+            <input type="text" id="universal-search-input" placeholder="Try: SBIN0000691, 201301, NH44, UP16DB1741, ABCDE1234F..." 
+              class="w-full py-3 pl-4 pr-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-slate-300 font-mono text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+          </div>
+          <button type="submit" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-2 shrink-0 shadow-md">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>Auto-Detect & Fetch</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category Navigation Tabs -->
+    <div class="bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 custom-scroll text-xs font-semibold">
+        
+        <button onclick="selectService('bank')" id="tab-bank" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="landmark" class="w-4 h-4"></i>
+          <span>Bank & IFSC</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 font-mono">LIVE API</span>
+        </button>
+
+        <button onclick="selectService('postal')" id="tab-postal" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="map-pin" class="w-4 h-4"></i>
+          <span>PIN Code & Postal</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 font-mono">LIVE API</span>
+        </button>
+
+        <button onclick="selectService('roads')" id="tab-roads" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="route" class="w-4 h-4"></i>
+          <span>Roads & Highways (NHAI/OSM)</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 font-mono">LIVE GIS</span>
+        </button>
+
+        <button onclick="selectService('rto')" id="tab-rto" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="car" class="w-4 h-4"></i>
+          <span>RTO Vehicle & DL</span>
+        </button>
+
+        <button onclick="selectService('pan')" id="tab-pan" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="credit-card" class="w-4 h-4"></i>
+          <span>PAN Tax Decoder</span>
+        </button>
+
+        <button onclick="selectService('gstin')" id="tab-gstin" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="building-2" class="w-4 h-4"></i>
+          <span>GSTIN Business</span>
+        </button>
+
+        <button onclick="selectService('insurance')" id="tab-insurance" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="shield-plus" class="w-4 h-4"></i>
+          <span>Insurance & IIB Status</span>
+        </button>
+
+        <button onclick="selectService('uid')" id="tab-uid" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="fingerprint" class="w-4 h-4"></i>
+          <span>Offline e-KYC / DigiLocker</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Main Two-Column Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Left Column: Input Form -->
+      <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
+        
+        <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div id="form-icon" class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+              <i data-lucide="landmark" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="form-title" class="font-bold text-base text-slate-900 dark:text-white">Bank IFSC Live Lookup</h2>
+                <span id="form-mode-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">LIVE API</span>
+              </div>
+              <p id="form-subtitle" class="text-xs text-slate-500 mt-0.5">RBI / NPCI Real-Time Bank Branch Directory</p>
+            </div>
+          </div>
+
+          <button type="button" onclick="fillSampleForCurrent()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition shrink-0">
+            Sample Input
+          </button>
+        </div>
+
+        <!-- Dynamic Fields Form -->
+        <form id="query-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          <div id="dynamic-inputs" class="space-y-4"></div>
+
+          <!-- Progress Status -->
+          <div id="loading-bar" class="hidden space-y-1.5">
+            <div class="flex justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+              <span id="loading-text">Querying Public Endpoint...</span>
+              <span>LIVE</span>
+            </div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-blue-600 h-full w-2/3 animate-pulse"></div>
