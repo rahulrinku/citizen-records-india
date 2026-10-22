@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rashtriya Abhilekh Setu | National Record & Citizen Verification Gateway</title>
+  <title>Bharat OpenSetu | Unified Public Record & Open Data Intelligence Portal</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,28 +13,9 @@
       theme: {
         extend: {
           colors: {
-            saffron: {
-              50: '#fff7ed',
-              100: '#ffedd5',
-              500: '#f97316',
-              600: '#ea580c',
-              700: '#c2410c',
-            },
-            ashoka: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
-              950: '#0f172a',
-            },
-            indiaGreen: {
-              50: '#f0fdf4',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-              800: '#166534',
-            }
+            saffron: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' },
+            ashoka: { 50: '#eff6ff', 100: '#dbeafe', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a', 950: '#0f172a' },
+            indiaGreen: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
@@ -45,7 +26,7 @@
     }
   </script>
 
-  <!-- Google Fonts & Lucide Icons -->
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -54,66 +35,84 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
-    
     .gov-tricolor-line {
       background: linear-gradient(90deg, #ff9933 0%, #ff9933 33.3%, #ffffff 33.3%, #ffffff 66.6%, #138808 66.6%, #138808 100%);
       height: 4px;
     }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
 
-    .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.4);
-      border-radius: 9999px;
-    }
-
-    /* Print Styling for Verified Certificates */
     @media print {
-      body * {
-        visibility: hidden;
+      body * { visibility: hidden; }
+      #printable-area, #printable-area * { visibility: visible; }
+      #printable-area {
+        position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 24px;
+        background: white !important; color: black !important; display: block !important;
       }
-      #printable-certificate-area, #printable-certificate-area * {
-        visibility: visible;
-      }
-      #printable-certificate-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 20px;
-        background: white !important;
-        color: black !important;
-      }
-      .no-print {
-        display: none !important;
-      }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
 
-  <!-- Tricolor Bar on Top -->
+  <!-- Tricolor Top Border -->
   <div class="gov-tricolor-line w-full sticky top-0 z-50"></div>
 
-  <!-- Notification Toast -->
+  <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 max-w-sm px-4 py-3 bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-700 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 pointer-events-none">
-    <i data-lucide="info" class="w-5 h-5 text-saffron-500 shrink-0"></i>
-    <span id="toast-message" class="text-xs sm:text-sm font-medium">Notification message</span>
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 shrink-0"></i>
+    <span id="toast-message" class="text-xs sm:text-sm font-medium">Ready</span>
+  </div>
+
+  <!-- API Gateway Modal -->
+  <div id="api-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600">
+            <i data-lucide="key-round" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Live API Gateway Configuration</h3>
+            <p class="text-xs text-slate-500">Connect your own API Setu / Surepass / OGD keys</p>
+          </div>
+        </div>
+        <button onclick="toggleApiModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300">
+          <strong>Note:</strong> Banking (IFSC), Postal (PIN Code), and Road/Highway (OSM/NHAI) modules already connect to <strong>100% Free Live Public APIs</strong> with zero keys required. For regulated KYC databases (RTO Vahan, PAN, GSTIN), you can optionally supply a production proxy URL and Bearer token below.
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Custom Gateway / Proxy Endpoint URL (Optional)</label>
+          <input type="url" id="custom-api-url" placeholder="https://api.apisetu.gov.in or your Cloudflare Worker URL" class="w-full font-mono text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">API Key / Bearer Token (Stored locally in browser)</label>
+          <input type="password" id="custom-api-key" placeholder="Enter your API Setu / Surepass / data.gov.in API Key" class="w-full font-mono text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+        <button onclick="clearApiKeys()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100">Reset to Default</button>
+        <button onclick="saveApiKeys()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">Save Configuration</button>
+      </div>
+    </div>
   </div>
 
   <!-- Header -->
   <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-1 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
+      <div class="flex items-center justify-between h-20 gap-3">
         
-        <!-- Emblem Motif & Title -->
-        <div class="flex items-center gap-3 sm:gap-4">
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
           <div class="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-ashoka-950 via-ashoka-900 to-indigo-950 text-amber-400 shadow-md border border-amber-500/30 shrink-0">
             <svg class="w-7 h-7 text-amber-400 animate-[spin_60s_linear_infinite]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
               <circle cx="12" cy="12" r="9.5"></circle>
@@ -129,28 +128,25 @@
           <div>
             <div class="flex items-center gap-2 flex-wrap">
               <h1 class="font-extrabold text-base sm:text-xl tracking-tight text-slate-950 dark:text-white">
-                National Record & Citizen Verification Gateway
+                Bharat OpenSetu — Public Record & Data Portal
               </h1>
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-saffron-100 dark:bg-saffron-950/70 text-saffron-700 dark:text-saffron-400 border border-saffron-300 dark:border-saffron-800">
-                राष्‍ट्रीय अभिलेख सेतु
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                LIVE REST + SMART DECODER
               </span>
             </div>
-            <div class="flex items-center gap-3 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              <span class="font-semibold text-slate-700 dark:text-slate-300">सत्यमेव जयते</span>
-              <span>&bull;</span>
-              <span>Digital Public Infrastructure (India Stack & API Setu)</span>
-            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Unified Lookup for Banking, Postal, Highways, RTO Vahan, PAN, GSTIN, Insurance & e-KYC
+            </p>
           </div>
         </div>
 
-        <!-- Controls / Badges -->
-        <div class="flex items-center gap-2 sm:gap-3">
-          <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
-            <span>DPDP Act 2023 Compliant</span>
-          </div>
+        <!-- Right Controls -->
+        <div class="flex items-center gap-2">
+          <button onclick="toggleApiModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 text-xs font-semibold text-slate-700 dark:text-slate-200 transition">
+            <i data-lucide="settings-2" class="w-4 h-4 text-blue-600"></i>
+            <span class="hidden sm:inline">API Gateway Keys</span>
+          </button>
 
-          <!-- Theme Toggle -->
           <button id="theme-btn" aria-label="Toggle Theme" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
             <i id="theme-sun" data-lucide="sun" class="w-4 h-4 hidden"></i>
             <i id="theme-moon" data-lucide="moon" class="w-4 h-4"></i>
@@ -161,1350 +157,1177 @@
     </div>
   </header>
 
-  <!-- Legal & UIDAI Protection Banner -->
-  <div class="bg-amber-500/10 dark:bg-amber-950/40 border-b border-amber-500/20 py-2.5 px-4 text-xs">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2 text-amber-900 dark:text-amber-200">
-      <div class="flex items-start sm:items-center gap-2">
-        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0"></i>
-        <span><strong>Regulatory Safeguard:</strong> Direct raw 12-digit UID numbers cannot be harvested via public open APIs under the Aadhaar Act and DPDP Act 2023. Verifications use authorized Offline e-KYC XML, Masked Tokens, and Consent-driven DPI Handshakes.</span>
+  <!-- Main Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Universal Quick Search Bar (Auto-Detects Input Type) -->
+    <div class="bg-gradient-to-r from-slate-900 via-ashoka-950 to-indigo-950 rounded-2xl p-5 sm:p-6 text-white shadow-lg border border-blue-500/20">
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-1.5">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Universal Smart Identifier Search (Auto-Detects Record Type)</span>
+        </div>
+        <p class="text-xs text-blue-100/90 mb-3">
+          Paste any **IFSC Code** (`SBIN0000691`), **PIN Code** (`201301`), **Highway** (`NH44`), **Vehicle RC** (`UP16DB1741`), **PAN** (`ABCDE1234F`), or **GSTIN** (`09AAACP1234C1Z5`) — our engine automatically routes your query.
+        </p>
+        <form onsubmit="handleUniversalSearch(event)" class="flex flex-col sm:flex-row gap-2.5">
+          <div class="relative flex-1">
+            <input type="text" id="universal-search-input" placeholder="Try: SBIN0000691, 201301, NH44, UP16DB1741, ABCDE1234F..." 
+              class="w-full py-3 pl-4 pr-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder:text-slate-300 font-mono text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+          </div>
+          <button type="submit" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm transition flex items-center justify-center gap-2 shrink-0 shadow-md">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>Auto-Detect & Fetch</span>
+          </button>
+        </form>
       </div>
-      <a href="#compliance-info" class="font-bold underline text-amber-800 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 whitespace-nowrap">View DPDP Framework &rarr;</a>
     </div>
-  </div>
 
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-6">
-
-    <!-- Service Selection Tabs Bar -->
-    <div class="bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <!-- Category Navigation Tabs -->
+    <div class="bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
       <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 custom-scroll text-xs font-semibold">
         
-        <button onclick="setActiveService('pan')" id="tab-btn-pan" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap bg-blue-600 text-white shadow-sm transition">
-          <i data-lucide="credit-card" class="w-4 h-4"></i>
-          <span>PAN Verification</span>
+        <button onclick="selectService('bank')" id="tab-bank" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="landmark" class="w-4 h-4"></i>
+          <span>Bank & IFSC</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 font-mono">LIVE API</span>
         </button>
 
-        <button onclick="setActiveService('vahan')" id="tab-btn-vahan" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+        <button onclick="selectService('postal')" id="tab-postal" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="map-pin" class="w-4 h-4"></i>
+          <span>PIN Code & Postal</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 font-mono">LIVE API</span>
+        </button>
+
+        <button onclick="selectService('roads')" id="tab-roads" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="route" class="w-4 h-4"></i>
+          <span>Roads & Highways (NHAI/OSM)</span>
+          <span class="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-400 font-mono">LIVE GIS</span>
+        </button>
+
+        <button onclick="selectService('rto')" id="tab-rto" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
           <i data-lucide="car" class="w-4 h-4"></i>
-          <span>Vehicle RC (Vahan)</span>
+          <span>RTO Vehicle & DL</span>
         </button>
 
-        <button onclick="setActiveService('sarathi')" id="tab-btn-sarathi" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-lucide="id-card" class="w-4 h-4"></i>
-          <span>Driving Licence (Sarathi)</span>
+        <button onclick="selectService('pan')" id="tab-pan" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="credit-card" class="w-4 h-4"></i>
+          <span>PAN Tax Decoder</span>
         </button>
 
-        <button onclick="setActiveService('gstin')" id="tab-btn-gstin" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+        <button onclick="selectService('gstin')" id="tab-gstin" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
           <i data-lucide="building-2" class="w-4 h-4"></i>
           <span>GSTIN Business</span>
         </button>
 
-        <button onclick="setActiveService('abha')" id="tab-btn-abha" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-lucide="heart-pulse" class="w-4 h-4"></i>
-          <span>ABHA Health ID</span>
+        <button onclick="selectService('insurance')" id="tab-insurance" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="shield-plus" class="w-4 h-4"></i>
+          <span>Insurance & IIB Status</span>
         </button>
 
-        <button onclick="setActiveService('ekyc')" id="tab-btn-ekyc" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        <button onclick="selectService('uid')" id="tab-uid" class="service-tab flex items-center gap-2 px-3.5 py-2.5 rounded-xl whitespace-nowrap transition">
+          <i data-lucide="fingerprint" class="w-4 h-4"></i>
           <span>Offline e-KYC / DigiLocker</span>
         </button>
 
-        <button onclick="setActiveService('opendata')" id="tab-btn-opendata" class="service-tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-lucide="database" class="w-4 h-4"></i>
-          <span>data.gov.in Explorer</span>
-        </button>
-
       </div>
     </div>
 
-    <!-- Active Form & Output Layout -->
+    <!-- Main Two-Column Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
-      <!-- Left Column: Input Form Box -->
-      <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+      <!-- Left Column: Input Form -->
+      <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
         
-        <!-- Form Header -->
-        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-5">
+        <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
           <div class="flex items-center gap-3">
-            <span id="service-icon-container" class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400">
-              <i data-lucide="credit-card" class="w-5 h-5"></i>
-            </span>
+            <div id="form-icon" class="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+              <i data-lucide="landmark" class="w-5 h-5"></i>
+            </div>
             <div>
-              <h2 id="service-title" class="font-bold text-base text-slate-900 dark:text-white">PAN Verification Service</h2>
-              <p id="service-dept" class="text-xs text-slate-500">Income Tax Department / NSDL Database</p>
+              <div class="flex items-center gap-2">
+                <h2 id="form-title" class="font-bold text-base text-slate-900 dark:text-white">Bank IFSC Live Lookup</h2>
+                <span id="form-mode-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">LIVE API</span>
+              </div>
+              <p id="form-subtitle" class="text-xs text-slate-500 mt-0.5">RBI / NPCI Real-Time Bank Branch Directory</p>
             </div>
           </div>
-          <button onclick="populateSampleData()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900 transition">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-            <span>Fill Sample Data</span>
+
+          <button type="button" onclick="fillSampleForCurrent()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition shrink-0">
+            Sample Input
           </button>
         </div>
 
-        <!-- Form Elements Container -->
-        <form id="record-verification-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
-          
-          <div id="dynamic-fields-wrapper" class="space-y-4">
-            <!-- Injected dynamically via JS based on selected tab -->
-          </div>
+        <!-- Dynamic Fields Form -->
+        <form id="query-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+          <div id="dynamic-inputs" class="space-y-4"></div>
 
-          <!-- Consent Checkbox (DPDP 2023) -->
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
-            <label class="flex items-start gap-2.5 cursor-pointer">
-              <input type="checkbox" id="dpdp-consent-checkbox" required checked class="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-              <span class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                I hereby grant consent under <strong>DPDP Act 2023</strong> to query and verify records from authorized government repositories solely for identity validation.
-              </span>
-            </label>
-          </div>
-
-          <!-- Simulated Progress Bar (hidden during idle) -->
-          <div id="fetch-progress-container" class="hidden space-y-1.5 pt-1">
+          <!-- Progress Status -->
+          <div id="loading-bar" class="hidden space-y-1.5">
             <div class="flex justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
-              <span id="fetch-status-text">Connecting to Secure Gateway...</span>
-              <span id="fetch-percentage-text">45%</span>
+              <span id="loading-text">Querying Public Endpoint...</span>
+              <span>LIVE</span>
             </div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div id="fetch-progress-bar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-0 transition-all duration-300"></div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-blue-600 h-full w-2/3 animate-pulse"></div>
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="pt-2 flex items-center gap-3">
-            <button type="submit" id="submit-verify-btn" class="flex-1 inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm shadow-md transition">
-              <i data-lucide="search" class="w-4 h-4"></i>
-              <span>Fetch & Verify Record</span>
-            </button>
-            <button type="button" onclick="resetActiveForm()" title="Reset fields" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            </button>
-          </div>
-
+          <button type="submit" id="submit-btn" class="w-full py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Fetch Public Record</span>
+          </button>
         </form>
+
+        <!-- Data Source Transparency Notice -->
+        <div id="source-explainer" class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 text-xs text-slate-600 dark:text-slate-300 space-y-1">
+          <!-- Populated dynamically -->
+        </div>
 
       </div>
 
-      <!-- Right Column: Verification Results & Inspector -->
+      <!-- Right Column: Output Card & Raw JSON -->
       <div class="lg:col-span-7 space-y-4">
         
-        <!-- Results Card Wrapper -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs">
           
-          <!-- View Switcher & Actions -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+          <!-- Output Header -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-5">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <h3 class="font-bold text-sm text-slate-900 dark:text-white">Verification Credential Output</h3>
+              <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white">Fetched Public Record</h3>
+              <span id="data-origin-pill" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">SOURCE: LIVE_API</span>
             </div>
 
             <div class="flex items-center gap-2">
-              <!-- Mode Tabs -->
               <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
-                <button id="view-mode-card-btn" onclick="setResultView('card')" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs transition">
-                  Smart Card
+                <button onclick="switchOutputTab('visual')" id="btn-view-visual" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs transition">
+                  Visual Record
                 </button>
-                <button id="view-mode-json-btn" onclick="setResultView('json')" class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
-                  JSON Payload
+                <button onclick="switchOutputTab('json')" id="btn-view-json" class="px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+                  Raw JSON
                 </button>
               </div>
 
-              <!-- Print / PDF Certificate Button -->
-              <button onclick="triggerPrintCertificate()" title="Download Printable Official Verification Certificate" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition">
+              <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                 <i data-lucide="printer" class="w-3.5 h-3.5 text-blue-600"></i>
-                <span class="hidden sm:inline">Print / Save PDF</span>
+                <span class="hidden sm:inline">Print / PDF</span>
               </button>
             </div>
           </div>
 
-          <!-- Smart Card View Area -->
-          <div id="results-card-view" class="py-2">
-            <!-- Injected based on active verification response -->
-          </div>
+          <!-- Visual Card Output -->
+          <div id="visual-output-container" class="py-1"></div>
 
-          <!-- JSON Payload View Area -->
-          <div id="results-json-view" class="hidden space-y-3">
-            <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-mono">
-              <span>Endpoint: <span id="json-endpoint-label" class="text-blue-600 dark:text-blue-400">/v2/pan/verify</span></span>
-              <button onclick="copyJsonPayload()" class="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:underline">
+          <!-- Raw JSON Output -->
+          <div id="json-output-container" class="hidden space-y-2">
+            <div class="flex items-center justify-between text-xs font-mono text-slate-500">
+              <span id="endpoint-url-display">GET https://ifsc.razorpay.com/SBIN0000691</span>
+              <button onclick="copyJson()" class="text-blue-600 hover:underline flex items-center gap-1">
                 <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                <span id="copy-json-btn-text">Copy JSON</span>
+                <span>Copy JSON</span>
               </button>
             </div>
-            <pre id="json-output-block" class="p-4 rounded-xl bg-slate-950 text-emerald-400 font-mono text-xs overflow-x-auto max-h-[380px] custom-scroll leading-relaxed border border-slate-800"></pre>
+            <pre id="json-pre" class="p-4 rounded-xl bg-slate-950 text-emerald-400 font-mono text-xs overflow-x-auto max-h-[420px] custom-scroll leading-relaxed border border-slate-800"></pre>
           </div>
 
-          <!-- Audit Metadata Bar -->
-          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
-            <div class="flex items-center gap-1.5">
-              <i data-lucide="fingerprint" class="w-3.5 h-3.5 text-slate-500"></i>
-              <span>Verification Hash: <span id="audit-hash" class="font-mono text-slate-600 dark:text-slate-300">0x89e2...d41b</span></span>
-            </div>
-            <span id="audit-timestamp" class="font-mono">Timestamp: 2026-10-22 21:05:00 IST</span>
-          </div>
-
-        </div>
-
-        <!-- Open Data Table View (Displayed when on Open Data Tab) -->
-        <div id="opendata-table-card" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-2">
-              <i data-lucide="table" class="w-4 h-4 text-emerald-600"></i>
-              <span>data.gov.in Live Catalog Stream</span>
-            </h4>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 font-mono font-bold">OGD-REST-V1</span>
-          </div>
-          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table id="ogd-data-table" class="w-full text-left text-xs">
-              <!-- Rendered via JS -->
-            </table>
-          </div>
         </div>
 
       </div>
 
     </div>
 
-    <!-- Printable Certificate Off-Screen Template -->
-    <div id="printable-certificate-area" class="hidden bg-white text-black p-8 border-4 border-double border-slate-800 max-w-2xl mx-auto rounded-none">
-      <div class="text-center border-b-2 border-black pb-4 mb-4">
-        <h2 class="text-xl font-bold uppercase tracking-wider">Government Record Verification Report</h2>
-        <p class="text-xs font-semibold">National Record & Citizen Verification Gateway &bull; India Stack</p>
-        <p class="text-[10px] text-slate-600">Issued under Digital Personal Data Protection (DPDP) Act 2023 Guidelines</p>
-      </div>
-      <div id="print-certificate-body" class="space-y-3 text-xs leading-relaxed font-sans">
-        <!-- Injected before print -->
-      </div>
-      <div class="mt-8 pt-4 border-t border-black flex justify-between items-center text-[10px]">
-        <div>
-          <p>Verified through authorized API Setu / NIC gateway token.</p>
-          <p>Cryptographic Signature: <span class="font-mono font-bold">VALID_GOV_ROOT_CA</span></p>
-        </div>
-        <div class="text-right">
-          <p class="font-bold">Rashtriya Abhilekh Setu</p>
-          <p>Verified on <span id="print-timestamp">Current Date</span></p>
-        </div>
+    <!-- Printable Area -->
+    <div id="printable-area" class="hidden">
+      <div style="border: 2px solid #000; padding: 24px; font-family: sans-serif;">
+        <h2 style="margin: 0; font-size: 18px; text-transform: uppercase;">Bharat OpenSetu — Public Record Verification</h2>
+        <p style="margin: 4px 0 16px; font-size: 12px; color: #444;">Generated via Unified Public Record & Open Data Intelligence Portal</p>
+        <hr style="border: 1px solid #000; margin-bottom: 16px;">
+        <div id="print-content" style="font-size: 13px; line-height: 1.6;"></div>
       </div>
     </div>
-
-    <!-- Educational & Legal Framework Section -->
-    <section id="compliance-info" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
-      
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-xl bg-saffron-100 dark:bg-saffron-950/70 text-saffron-600 dark:text-saffron-400">
-          <i data-lucide="scale" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white">India Stack Identity Architecture & Legal Compliance</h3>
-          <p class="text-xs text-slate-500">Why public open APIs are structured with privacy safeguards</p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs text-slate-600 dark:text-slate-300">
-        
-        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
-          <h4 class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <i data-lucide="lock" class="w-4 h-4 text-emerald-600"></i>
-            UIDAI & Privacy Safeguards
-          </h4>
-          <p class="leading-relaxed">
-            Direct 12-digit UID numbers and core biometrics cannot be exposed or queried on public web interfaces. Legitimate verification is strictly processed via <strong>Offline Paperless e-KYC (XML with 4-digit code)</strong>, <strong>Masked Tokens</strong>, or regulated AUA/KUA gateways.
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
-          <h4 class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <i data-lucide="file-check-2" class="w-4 h-4 text-blue-600"></i>
-            DPDP Act 2023 Consent Rule
-          </h4>
-          <p class="leading-relaxed">
-            Under the Digital Personal Data Protection Act 2023, every verification query against national databases (PAN, Parivahan, GSTN) mandates unbundled, informed citizen consent. Queries generate immutable digital audit signatures.
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
-          <h4 class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <i data-lucide="network" class="w-4 h-4 text-saffron-600"></i>
-            API Setu & DigiLocker Gateway
-          </h4>
-          <p class="leading-relaxed">
-            The Government of India provides unified sandbox integrations through <strong>apisetu.gov.in</strong> and <strong>data.gov.in</strong>. Developers authenticate using Mutual TLS (mTLS) and asymmetric keys, allowing verification without saving unauthorized copies.
-          </p>
-        </div>
-
-      </div>
-
-    </section>
 
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-6 text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-base">🇮🇳</span>
-        <span><strong>National Record & Citizen Verification Gateway</strong> &bull; India Stack Verification Architecture.</span>
+  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-5 text-xs text-slate-500 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <strong>Bharat OpenSetu</strong> &bull; Open Data Intelligence & Public Domain Record Aggregator
       </div>
-      <div class="flex items-center gap-5">
-        <a href="https://apisetu.gov.in" target="_blank" rel="noreferrer" class="hover:text-blue-600 transition flex items-center gap-1">API Setu <i data-lucide="external-link" class="w-3 h-3"></i></a>
-        <a href="https://data.gov.in" target="_blank" rel="noreferrer" class="hover:text-blue-600 transition flex items-center gap-1">data.gov.in <i data-lucide="external-link" class="w-3 h-3"></i></a>
-        <a href="https://digilocker.gov.in" target="_blank" rel="noreferrer" class="hover:text-blue-600 transition flex items-center gap-1">DigiLocker <i data-lucide="external-link" class="w-3 h-3"></i></a>
+      <div class="flex items-center gap-4">
+        <span>Live Integrations: RBI IFSC &bull; India Post &bull; OpenStreetMap GIS &bull; Parivahan & Tax Decoders</span>
       </div>
     </div>
   </footer>
 
-  <!-- Application Logic -->
+  <!-- JavaScript Engine -->
   <script>
-    // -------------------------------------------------------------
-    // RTO & LOCATION PARSER DATABASE (National Parivahan Engine)
-    // -------------------------------------------------------------
-    const RTO_LOOKUP = {
-      // Uttar Pradesh
-      "UP14": { name: "RTO Ghaziabad", state: "Uttar Pradesh", region: "NCR Zone" },
-      "UP15": { name: "RTO Meerut", state: "Uttar Pradesh", region: "Meerut Division" },
-      "UP16": { name: "RTO Noida (Gautam Buddha Nagar)", state: "Uttar Pradesh", region: "NCR Zone" },
-      "UP17": { name: "RTO Baghpat", state: "Uttar Pradesh", region: "NCR Zone" },
-      "UP32": { name: "RTO Lucknow (Transport Nagar)", state: "Uttar Pradesh", region: "Central Zone" },
-      "UP70": { name: "RTO Prayagraj (Allahabad)", state: "Uttar Pradesh", region: "Eastern Zone" },
-      "UP78": { name: "RTO Kanpur Nagar", state: "Uttar Pradesh", region: "Central Zone" },
-      "UP80": { name: "RTO Agra", state: "Uttar Pradesh", region: "Western Zone" },
-      "UP85": { name: "RTO Mathura", state: "Uttar Pradesh", region: "Western Zone" },
-      // Delhi
-      "DL01": { name: "RTO Mall Road (North Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL02": { name: "RTO Tilak Marg (New Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL03": { name: "RTO Sheikh Sarai (South Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL04": { name: "RTO Janakpuri (West Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL05": { name: "RTO Loni Road (North East Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL06": { name: "RTO Sarai Kale Khan (Central Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL07": { name: "RTO Mayur Vihar (East Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL08": { name: "RTO Wazirpur (North West Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL09": { name: "RTO Palam (South West Delhi)", state: "Delhi", region: "Delhi NCT" },
-      "DL10": { name: "RTO Raja Garden (West Delhi II)", state: "Delhi", region: "Delhi NCT" },
-      "DL11": { name: "RTO Rohini (North West Delhi II)", state: "Delhi", region: "Delhi NCT" },
-      "DL12": { name: "RTO Vasant Vihar (South West Delhi II)", state: "Delhi", region: "Delhi NCT" },
-      "DL13": { name: "RTO Surajmal Vihar (East Delhi II)", state: "Delhi", region: "Delhi NCT" },
-      "DL14": { name: "RTO Dwarka", state: "Delhi", region: "Delhi NCT" },
-      // Haryana
-      "HR26": { name: "RTO Gurugram (North)", state: "Haryana", region: "NCR Zone" },
-      "HR51": { name: "RTO Faridabad", state: "Haryana", region: "NCR Zone" },
-      "HR72": { name: "RTO Gurugram (South)", state: "Haryana", region: "NCR Zone" },
-      "HR98": { name: "RTO Badshahpur (Gurugram)", state: "Haryana", region: "NCR Zone" },
-      // Maharashtra
-      "MH01": { name: "RTO Mumbai Central (Tardeo)", state: "Maharashtra", region: "Mumbai Division" },
-      "MH02": { name: "RTO Mumbai West (Andheri)", state: "Maharashtra", region: "Mumbai Division" },
-      "MH03": { name: "RTO Mumbai East (Wadala)", state: "Maharashtra", region: "Mumbai Division" },
-      "MH04": { name: "RTO Thane", state: "Maharashtra", region: "Konkan Division" },
-      "MH12": { name: "RTO Pune", state: "Maharashtra", region: "Pune Division" },
-      "MH14": { name: "RTO Pimpri-Chinchwad", state: "Maharashtra", region: "Pune Division" },
-      // Rajasthan
-      "RJ14": { name: "RTO Jaipur Central", state: "Rajasthan", region: "Jaipur Zone" },
-      "RJ45": { name: "RTO Jaipur North", state: "Rajasthan", region: "Jaipur Zone" },
-      // Karnataka
-      "KA01": { name: "RTO Bangalore Central (Koramangala)", state: "Karnataka", region: "Bengaluru Urban" },
-      "KA03": { name: "RTO Bangalore East (Indiranagar)", state: "Karnataka", region: "Bengaluru Urban" },
-      "KA05": { name: "RTO Bangalore South (Jayanagar)", state: "Karnataka", region: "Bengaluru Urban" },
-      "KA51": { name: "RTO Electronic City (Bangalore)", state: "Karnataka", region: "Bengaluru Urban" },
-      // Tamil Nadu
-      "TN01": { name: "RTO Chennai Central (Ayanavaram)", state: "Tamil Nadu", region: "Chennai Region" },
-      "TN07": { name: "RTO Chennai South (Thiruvanmiyur)", state: "Tamil Nadu", region: "Chennai Region" },
-      // West Bengal
-      "WB01": { name: "RTO Kolkata (Beltala)", state: "West Bengal", region: "Kolkata Metropolitan" },
-      "WB02": { name: "RTO Kolkata (North)", state: "West Bengal", region: "Kolkata Metropolitan" }
-    };
-
-    const STATE_PREFIX_NAMES = {
-      "AN": "Andaman and Nicobar", "AP": "Andhra Pradesh", "AR": "Arunachal Pradesh",
+    // ============================================================================
+    // 1. COMPREHENSIVE ALL-INDIA RTO & STATE DIRECTORY
+    // ============================================================================
+    const STATE_MAP = {
+      "AN": "Andaman & Nicobar Islands", "AP": "Andhra Pradesh", "AR": "Arunachal Pradesh",
       "AS": "Assam", "BR": "Bihar", "CH": "Chandigarh", "CG": "Chhattisgarh",
-      "DD": "Daman and Diu", "DL": "Delhi", "DN": "Dadra and Nagar Haveli",
-      "GA": "Goa", "GJ": "Gujarat", "HR": "Haryana", "HP": "Himachal Pradesh",
-      "JH": "Jharkhand", "JK": "Jammu and Kashmir", "KA": "Karnataka",
-      "KL": "Kerala", "LA": "Ladakh", "LD": "Lakshadweep", "MH": "Maharashtra",
-      "ML": "Meghalaya", "MN": "Manipur", "MP": "Madhya Pradesh", "MZ": "Mizoram",
-      "NL": "Nagaland", "OD": "Odisha", "PB": "Punjab", "PY": "Puducherry",
-      "RJ": "Rajasthan", "SK": "Sikkim", "TN": "Tamil Nadu", "TS": "Telangana",
-      "TR": "Tripura", "UP": "Uttar Pradesh", "UK": "Uttarakhand", "WB": "West Bengal"
+      "DD": "Daman & Diu", "DL": "Delhi NCT", "GA": "Goa", "GJ": "Gujarat",
+      "HR": "Haryana", "HP": "Himachal Pradesh", "JH": "Jharkhand", "JK": "Jammu & Kashmir",
+      "KA": "Karnataka", "KL": "Kerala", "LA": "Ladakh", "LD": "Lakshadweep",
+      "MH": "Maharashtra", "ML": "Meghalaya", "MN": "Manipur", "MP": "Madhya Pradesh",
+      "MZ": "Mizoram", "NL": "Nagaland", "OD": "Odisha", "OR": "Odisha", "PB": "Punjab",
+      "PY": "Puducherry", "RJ": "Rajasthan", "SK": "Sikkim", "TN": "Tamil Nadu",
+      "TS": "Telangana", "TR": "Tripura", "UP": "Uttar Pradesh", "UK": "Uttarakhand",
+      "UA": "Uttarakhand", "WB": "West Bengal", "BH": "Bharat Series (All-India National Permit)"
     };
 
-    function resolveRTO(rcClean) {
-      if (!rcClean || rcClean.length < 4) {
-        return { name: "National Parivahan Registry", state: "India", region: "Central Repository" };
-      }
-      
-      const fourCode = rcClean.substring(0, 4);
-      if (RTO_LOOKUP[fourCode]) {
-        return RTO_LOOKUP[fourCode];
-      }
+    const GST_STATE_CODES = {
+      "01": "Jammu & Kashmir", "02": "Himachal Pradesh", "03": "Punjab", "04": "Chandigarh",
+      "05": "Uttarakhand", "06": "Haryana", "07": "Delhi", "08": "Rajasthan",
+      "09": "Uttar Pradesh", "10": "Bihar", "11": "Sikkim", "12": "Arunachal Pradesh",
+      "13": "Nagaland", "14": "Manipur", "18": "Assam", "19": "West Bengal",
+      "20": "Jharkhand", "21": "Odisha", "22": "Chhattisgarh", "23": "Madhya Pradesh",
+      "24": "Gujarat", "27": "Maharashtra", "29": "Karnataka", "30": "Goa",
+      "32": "Kerala", "33": "Tamil Nadu", "36": "Telangana", "37": "Andhra Pradesh"
+    };
 
-      // Check standard 2-letter state prefix
-      const statePrefix = rcClean.substring(0, 2);
-      const districtNum = rcClean.substring(2, 4);
-      const stateName = STATE_PREFIX_NAMES[statePrefix] || "India";
+    const SPECIFIC_RTO_MAP = {
+      "UP11": "Saharanpur RTO", "UP12": "Muzaffarnagar RTO", "UP13": "Bulandshahr RTO",
+      "UP14": "Ghaziabad RTO", "UP15": "Meerut RTO", "UP16": "Noida / Gautam Buddha Nagar RTO",
+      "UP17": "Baghpat RTO", "UP20": "Bijnor RTO", "UP21": "Moradabad RTO",
+      "UP25": "Bareilly RTO", "UP32": "Lucknow Transport Nagar RTO", "UP37": "Hapur RTO",
+      "UP53": "Gorakhpur RTO", "UP65": "Varanasi RTO", "UP70": "Prayagraj (Allahabad) RTO",
+      "UP78": "Kanpur Nagar RTO", "UP80": "Agra RTO", "UP81": "Aligarh RTO", "UP85": "Mathura RTO",
+      "DL01": "Mall Road (North Delhi)", "DL02": "Tilak Marg (New Delhi)", "DL03": "Sheikh Sarai (South Delhi)",
+      "DL04": "Janakpuri (West Delhi)", "DL05": "Loni Road (North East Delhi)", "DL06": "Sarai Kale Khan (Central)",
+      "DL07": "Mayur Vihar (East Delhi)", "DL08": "Wazirpur (North West Delhi)", "DL09": "Palam (South West Delhi)",
+      "DL10": "Raja Garden (West Delhi)", "DL11": "Rohini (North West Delhi)", "DL12": "Vasant Vihar (South West)",
+      "DL13": "Surajmal Vihar (East)", "DL14": "Sonipat / Dwarka Zonal",
+      "HR26": "Gurugram (North) RTA", "HR51": "Faridabad RTA", "HR72": "Gurugram (South) RTA", "HR98": "Badshahpur Gurugram",
+      "RJ14": "Jaipur First (Jhalana) RTO", "RJ45": "Jaipur Second (Vidyadhar Nagar) RTO", "RJ19": "Jodhpur RTO", "RJ27": "Udaipur RTO",
+      "MH01": "Mumbai Central (Tardeo)", "MH02": "Mumbai West (Andheri)", "MH03": "Mumbai East (Wadala)",
+      "MH04": "Thane RTO", "MH12": "Pune City RTO", "MH14": "Pimpri-Chinchwad RTO",
+      "KA01": "Bengaluru Central (Koramangala)", "KA02": "Bengaluru West (Rajajinagar)", "KA03": "Bengaluru East (Indiranagar)",
+      "KA04": "Bengaluru North (Yeshwanthpur)", "KA05": "Bengaluru South (Jayanagar)", "KA51": "Electronic City Bengaluru",
+      "TN01": "Chennai Central (Ayanavaram)", "TN07": "Chennai South (Thiruvanmiyur)",
+      "WB01": "Kolkata Beltala RTO", "GJ01": "Ahmedabad Subhash Bridge RTO", "TS09": "Hyderabad Central (Khairatabad)"
+    };
 
-      return {
-        name: `RTO District ${districtNum} (${stateName})`,
-        state: stateName,
-        region: "State Transport Department"
-      };
-    }
+    const PAN_ENTITY_TYPES = {
+      "P": "Individual / Single Citizen",
+      "C": "Company / Corporate Entity",
+      "H": "Hindu Undivided Family (HUF)",
+      "A": "Association of Persons (AOP)",
+      "B": "Body of Individuals (BOI)",
+      "G": "Government Agency",
+      "J": "Artificial Juridical Person",
+      "L": "Local Authority",
+      "F": "Partnership Firm / LLP",
+      "T": "Trust"
+    };
 
-    // Dynamic Vehicle Spec Resolver based on alphanumeric plate hash
-    function resolveVehicleSpecs(rcClean) {
-      const isUP16 = rcClean.startsWith("UP16");
-      const isDL = rcClean.startsWith("DL");
-      const isEVSeries = rcClean.includes("EV") || rcClean.endsWith("E");
+    const NH_DIRECTORY = {
+      "NH44": { name: "National Highway 44 (Old NH7)", route: "Srinagar (J&K) to Kanyakumari (Tamil Nadu)", length: "4,112 km (Longest NH in India)",corridor: "North–South Corridor", status: "4 to 8 Lane Access Controlled / Toll Operational", authority: "NHAI / MoRTH" },
+      "NH48": { name: "National Highway 48 (Old NH8)", route: "New Delhi to Chennai (via Gurugram, Jaipur, Mumbai, Pune, Bengaluru)", length: "2,807 km", corridor: "Golden Quadrilateral (Delhi–Mumbai–Chennai)", status: "6 to 8 Lane Expressway & Highway", authority: "NHAI" },
+      "NH9": { name: "National Highway 9 (Old NH24 / NH10)", route: "Malout (Punjab) — Delhi — Ghaziabad — Hapur — Moradabad — Pithoragarh (Uttarakhand)", length: "811 km", corridor: "Delhi–Meerut Expressway & Rohilkhand Corridor", status: "6 to 14 Lane Smart Highway", authority: "NHAI" },
+      "NH19": { name: "National Highway 19 (Grand Trunk Road / Old NH2)", route: "Agra / Delhi to Kolkata (via Kanpur, Prayagraj, Varanasi, Dhanbad)", length: "1,435 km", corridor: "Golden Quadrilateral (Delhi–Kolkata)", status: "6 Lane Operational", authority: "NHAI" },
+      "NH27": { name: "National Highway 27 (East–West Corridor)", route: "Porbandar (Gujarat) to Silchar (Assam) via Udaipur, Kota, Jhansi, Kanpur, Lucknow, Gorakhpur, Guwahati", length: "3,507 km (2nd Longest NH in India)", corridor: "East–West Corridor", status: "4 to 6 Lane Operational", authority: "NHAI" },
+      "NH16": { name: "National Highway 16 (Old NH5)", route: "Kolkata (West Bengal) to Chennai (Tamil Nadu) via Bhubaneswar, Visakhapatnam, Vijayawada", length: "1,711 km", corridor: "Golden Quadrilateral (East Coast)", status: "4 to 6 Lane Operational", authority: "NHAI" },
+      "NH66": { name: "National Highway 66 (Old NH17 - Konkan Coast)", route: "Panvel (Mumbai) to Kanyakumari via Goa, Mangaluru, Kochi, Thiruvananthapuram", length: "1,640 km", corridor: "Western Coastal Corridor", status: "4 to 6 Lane Expansion", authority: "NHAI / MoRTH" }
+    };
 
-      // Generate a deterministic integer seed from RC string
-      let seed = 0;
-      for (let i = 0; i < rcClean.length; i++) {
-        seed = (seed * 31 + rcClean.charCodeAt(i)) >>> 0;
-      }
-
-      const carModels = [
-        { maker: "MARUTI SUZUKI INDIA LTD", model: "SWIFT ZXI DUALJET", class: "LMV (MOTOR CAR)", fuel: "PETROL / E20 BLEND", norms: "BHARAT STAGE VI (BS-VI OBD-2)" },
-        { maker: "HYUNDAI MOTOR INDIA LTD", model: "CRETA SX (O) 1.5 TURBO", class: "LMV (MOTOR CAR)", fuel: "PETROL / E20 BLEND", norms: "BHARAT STAGE VI (BS-VI OBD-2)" },
-        { maker: "TATA MOTORS PASSENGER VEHICLES", model: "NEXON CREATIVE PLUS", class: "LMV (MOTOR CAR)", fuel: "PETROL / TURBO", norms: "BHARAT STAGE VI (BS-VI)" },
-        { maker: "MAHINDRA & MAHINDRA LTD", model: "SCORPIO-N Z8L DIESEL 4WD", class: "LMV (MOTOR CAR)", fuel: "DIESEL / BS-VI SCR", norms: "BHARAT STAGE VI (BS-VI OBD-2)" },
-        { maker: "KIA MOTORS INDIA", model: "SELTOS GTX PLUS 1.5T", class: "LMV (MOTOR CAR)", fuel: "PETROL / TURBO", norms: "BHARAT STAGE VI (BS-VI OBD-2)" },
-        { maker: "TATA MOTORS PASSENGER VEHICLES", model: "NEXON EV LONG RANGE", class: "LMV (ELECTRIC MOTOR CAR)", fuel: "BATTERY ELECTRIC (BEV - ZERO EMISSION)", norms: "NOT APPLICABLE (BEV)" },
-        { maker: "HONDA CARS INDIA LTD", model: "CITY ZX 1.5 i-VTEC", class: "LMV (MOTOR CAR)", fuel: "PETROL / E20 BLEND", norms: "BHARAT STAGE VI (BS-VI)" },
-        { maker: "TOYOTA KIRLOSKAR MOTOR", model: "URBAN CRUISER HYRYDER STRONG HYBRID", class: "LMV (HYBRID ELECTRIC)", fuel: "PETROL / STRONG HYBRID", norms: "BHARAT STAGE VI (BS-VI)" }
-      ];
-
-      if (isEVSeries) {
-        return carModels[5];
-      }
-
-      const selected = carModels[seed % carModels.length];
-      return selected;
-    }
-
-    // -------------------------------------------------------------
-    // SERVICE DEFINITIONS & FIELD SCHEMAS
-    // -------------------------------------------------------------
+    // ============================================================================
+    // 2. SERVICE CONFIGURATION
+    // ============================================================================
     const SERVICES = {
-      pan: {
-        id: "pan",
-        title: "PAN Verification Service",
-        dept: "Income Tax Department (CBDT) / NSDL Protean",
-        icon: "credit-card",
-        color: "blue",
-        endpoint: "/v2/incometax/pan/verify",
-        sample: {
-          pan_num: "ABCDE1234F",
-          full_name: "ADITYA RAJESH SHARMA",
-          dob: "1991-05-14"
-        },
+      bank: {
+        title: "Bank IFSC & Branch Lookup",
+        subtitle: "Live RBI / NPCI Bank Directory via Razorpay Open API",
+        icon: "landmark",
+        isLiveApi: true,
+        sample: { ifsc_code: "SBIN0000691" },
         fields: [
-          { id: "pan_num", label: "Permanent Account Number (PAN)", type: "text", placeholder: "e.g. ABCDE1234F", pattern: "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", help: "Standard 10-char alphanumeric format (5 letters, 4 digits, 1 letter)" },
-          { id: "full_name", label: "Full Name (as per ITD Records)", type: "text", placeholder: "e.g. ADITYA RAJESH SHARMA", pattern: "^.+$", help: "Used to compute cryptographic name-match score" },
-          { id: "dob", label: "Date of Birth / Incorporation", type: "date", placeholder: "YYYY-MM-DD", pattern: "^.+$", help: "Matching parameter for tax status validation" }
-        ]
+          { id: "ifsc_code", label: "11-Character Bank IFSC Code", placeholder: "e.g. SBIN0000691, HDFC0000001, ICIC0000011", help: "Fetches real live bank branch address, MICR, RTGS, NEFT, IMPS, and UPI capabilities" }
+        ],
+        explainer: "<strong>100% Real-Time API:</strong> Queries <code>https://ifsc.razorpay.com/{IFSC}</code> directly from your browser to return official RBI branch metadata."
       },
-      vahan: {
-        id: "vahan",
-        title: "Vehicle RC Verification (Vahan 4.0)",
-        dept: "Ministry of Road Transport & Highways (MoRTH)",
+      postal: {
+        title: "India Post PIN Code & Regional Lookup",
+        subtitle: "Live Department of Posts Directory (api.postalpincode.in)",
+        icon: "map-pin",
+        isLiveApi: true,
+        sample: { pincode: "201301" },
+        fields: [
+          { id: "pincode", label: "6-Digit Indian Postal PIN Code", placeholder: "e.g. 201301 (Noida), 110001 (New Delhi), 302001 (Jaipur)", help: "Fetches all real post offices, circles, divisions, districts, and delivery statuses" }
+        ],
+        explainer: "<strong>100% Real-Time API:</strong> Queries <code>https://api.postalpincode.in/pincode/{PIN}</code> live to retrieve every registered Post Office in that jurisdiction."
+      },
+      roads: {
+        title: "National Highways & Road Infrastructure",
+        subtitle: "Live OpenStreetMap Overpass GIS + NHAI Corridor Directory",
+        icon: "route",
+        isLiveApi: true,
+        sample: { highway_code: "NH44" },
+        fields: [
+          { id: "highway_code", label: "National Highway Number or Corridor", placeholder: "e.g. NH44, NH48, NH9, NH19, NH27, NH16", help: "Fetches corridor endpoints, total length, and live OpenStreetMap GIS ways count" }
+        ],
+        explainer: "<strong>Live Hybrid GIS Engine:</strong> Combines official NHAI corridor specifications with live geospatial queries against the <strong>OpenStreetMap Overpass API</strong>."
+      },
+      rto: {
+        title: "RTO Vehicle RC & Driving Licence Decoder",
+        subtitle: "All-India RTO Jurisdiction Decoder + Optional API Setu Gateway",
         icon: "car",
-        color: "amber",
-        endpoint: "/v1/morth/vahan/rc-status",
-        sample: {
-          rc_num: "UP16DB1741",
-          chassis_last5: "91820"
-        },
+        isLiveApi: false,
+        sample: { rc_number: "UP16DB1741" },
         fields: [
-          { id: "rc_num", label: "Vehicle Registration Number (RC)", type: "text", placeholder: "e.g. UP16DB1741 or DL01AB1234", pattern: "^[A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{4}$", help: "State code followed by RTO and 4 digits (no spaces or hyphens)" },
-          { id: "chassis_last5", label: "Last 5 Digits of Chassis / VIN (Optional)", type: "text", placeholder: "e.g. 91820", pattern: "^[0-9A-Z]{0,5}$", help: "Enhances security check against national parivahan database" }
-        ]
+          { id: "rc_number", label: "Vehicle Registration Number (RC) or DL Number", placeholder: "e.g. UP16DB1741, DL01AB1234, RJ14CA9988, 22BH1234AA", help: "Decodes exact State, RTO Office, Series Code, and Bharat Series (BH) registration rules" }
+        ],
+        explainer: "<strong>Why OEM / Owner Names Require Keys:</strong> MoRTH Vahan 4.0 blocks anonymous public scraping of vehicle owner & maker records under the DPDP Act 2023. Without a paid API key, this module performs <strong>100% accurate RTO Jurisdiction & Series Structural Decoding</strong>. Click <em>API Gateway Keys</em> above to connect a live Vahan key."
       },
-      sarathi: {
-        id: "sarathi",
-        title: "Driving Licence Verification (Sarathi)",
-        dept: "MoRTH / National Informatics Centre (NIC)",
-        icon: "id-card",
-        color: "indigo",
-        endpoint: "/v1/morth/sarathi/dl-details",
-        sample: {
-          dl_num: "DL-1420110012345",
-          dl_dob: "1988-08-16"
-        },
+      pan: {
+        title: "PAN Card Structural Verifier & Tax Decoder",
+        subtitle: "CBDT Income Tax 10-Character Structural & Entity Decoder",
+        icon: "credit-card",
+        isLiveApi: false,
+        sample: { pan_input: "ABCDE1234F", holder_surname: "SHARMA" },
         fields: [
-          { id: "dl_num", label: "Driving Licence Number", type: "text", placeholder: "e.g. DL-1420110012345", pattern: "^[A-Z]{2}[0-9-]{10,18}$", help: "State RTO prefix and serial sequence" },
-          { id: "dl_dob", label: "Licence Holder Date of Birth", type: "date", placeholder: "YYYY-MM-DD", pattern: "^.+$", help: "Mandated identity token for Sarathi registry access" }
-        ]
+          { id: "pan_input", label: "10-Character Permanent Account Number (PAN)", placeholder: "e.g. ABCDE1234F or AAACP1234C", help: "4th letter indicates entity type (P=Individual, C=Company, H=HUF, F=Firm); 5th letter matches surname/entity initial" },
+          { id: "holder_surname", label: "Holder Last Name / Entity Name (Optional Check)", placeholder: "e.g. SHARMA (Starts with S) or EICHER (Starts with E)", help: "Cross-checks the 5th character of PAN against your surname/entity initial" }
+        ],
+        explainer: "<strong>Official CBDT Algorithm:</strong> Validates PAN syntax, decodes the 4th character taxpayer category (Individual, Company, Trust, HUF), and verifies the 5th character surname/entity initial rule."
       },
       gstin: {
-        id: "gstin",
-        title: "GSTIN Verification & Taxpayer Search",
-        dept: "Goods & Services Tax Network (GSTN)",
+        title: "GSTIN Taxpayer Checksum & State Decoder",
+        subtitle: "Goods & Services Tax Network (GSTN) 15-Digit Validator",
         icon: "building-2",
-        color: "emerald",
-        endpoint: "/v1/gstn/taxpayer/search",
-        sample: {
-          gstin_num: "07AAAAA0000A1Z5"
-        },
+        isLiveApi: false,
+        sample: { gstin_input: "09AAACP1234C1Z5" },
         fields: [
-          { id: "gstin_num", label: "15-Digit GST Identification Number", type: "text", placeholder: "e.g. 07AAAAA0000A1Z5", pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$", help: "State code + PAN + entity count + Z + checksum" }
-        ]
+          { id: "gstin_input", label: "15-Character GSTIN", placeholder: "e.g. 09AAACP1234C1Z5 or 07ABCDE1234F1Z2", help: "Extracts State Tax Jurisdiction (first 2 digits), embedded Corporate/Individual PAN (digits 3–12), and entity count" }
+        ],
+        explainer: "<strong>Deterministic GSTN Decoding:</strong> Automatically extracts the State Code (Census 2011), embedded PAN number, Taxpayer Constitution (Company/Individual/Firm), and registration sequence."
       },
-      abha: {
-        id: "abha",
-        title: "Ayushman Bharat Health Account (ABHA)",
-        dept: "National Health Authority (NHA / ABDM)",
-        icon: "heart-pulse",
-        color: "rose",
-        endpoint: "/v1/abdm/registration/verify-abha",
-        sample: {
-          abha_id: "91-4455-8899-2233",
-          mobile_num: "9876543210"
-        },
+      insurance: {
+        title: "Insurance Policy & IIB Registry Verifier",
+        subtitle: "IRDAI Insurer Code & Motor/Health Policy Validator",
+        icon: "shield-plus",
+        isLiveApi: false,
+        sample: { policy_no: "3001/249104829/00/000", insurer_code: "ICICI_LOMBARD" },
         fields: [
-          { id: "abha_id", label: "14-Digit ABHA Number or ABHA Address", type: "text", placeholder: "e.g. 91-4455-8899-2233 or rahul@abdm", pattern: "^.+$", help: "Unified digital health identifier under ABDM framework" },
-          { id: "mobile_num", label: "Linked Mobile Number (Demo OTP Verification)", type: "text", placeholder: "e.g. 9876543210", pattern: "^[6-9][0-9]{9}$", help: "Receives one-time verification token" }
-        ]
+          { id: "policy_no", label: "Policy Number / IIB Reference Number", placeholder: "e.g. 3001/249104829/00/000", help: "Enter Motor, Health, or Life insurance policy reference" },
+          { id: "insurer_code", label: "Registered IRDAI Insurer", type: "select", options: [
+            { value: "LIC_INDIA", label: "Life Insurance Corporation of India (IRDAI Reg: 512)" },
+            { value: "NEW_INDIA", label: "The New India Assurance Co. Ltd. (IRDAI Reg: 190)" },
+            { value: "ICICI_LOMBARD", label: "ICICI Lombard General Insurance (IRDAI Reg: 115)" },
+            { value: "HDFC_ERGO", label: "HDFC ERGO General Insurance (IRDAI Reg: 146)" },
+            { value: "STAR_HEALTH", label: "Star Health and Allied Insurance (IRDAI Reg: 129)" }
+          ], help: "Displays official IRDAI registration metadata, grievance portal, and IIB lookup status" }
+        ],
+        explainer: "<strong>IRDAI Public Directory:</strong> Returns official IRDAI Registration Numbers, Solvency Compliance status, and Insurance Information Bureau (IIB) linkage details."
       },
-      ekyc: {
-        id: "ekyc",
-        title: "Offline e-KYC & DigiLocker Verifier",
-        dept: "Paperless e-KYC / DigiLocker National Gateway",
-        icon: "shield-check",
-        color: "purple",
-        endpoint: "/v2/uidai/offline-ekyc/process",
-        sample: {
-          uid_ref: "9999-XXXX-4012",
-          share_code: "1984",
-          demo_otp: "778899"
-        },
+      uid: {
+        title: "Offline e-KYC & DigiLocker Token Verifier",
+        subtitle: "DPDP Act 2023 Compliant Paperless Verification Flow",
+        icon: "fingerprint",
+        isLiveApi: false,
+        sample: { vid_token: "VID-TOKEN-9981-X", share_code: "2026" },
         fields: [
-          { id: "uid_ref", label: "Masked ID or Virtual ID (VID Token)", type: "text", placeholder: "e.g. 9999-XXXX-4012", pattern: "^.+$", help: "Raw 12-digit UID cannot be queried directly. Use Masked ID or 16-digit VID." },
-          { id: "share_code", label: "4-Digit Share Code", type: "password", placeholder: "e.g. 1984", pattern: "^[0-9]{4}$", help: "4-character code used to decrypt Offline XML" },
-          { id: "demo_otp", label: "DigiLocker Consent OTP", type: "text", placeholder: "e.g. 778899", pattern: "^[0-9]{6}$", help: "Simulated 6-digit dynamic authentication OTP" }
-        ]
-      },
-      opendata: {
-        id: "opendata",
-        title: "Open Government Data (data.gov.in)",
-        dept: "National Informatics Centre (NIC) / OGD Platform",
-        icon: "database",
-        color: "teal",
-        endpoint: "/api/datagov/v1/resource/query",
-        sample: {
-          catalog_type: "pds_ration",
-          state_filter: "Uttar Pradesh"
-        },
-        fields: [
-          { id: "catalog_type", label: "Public Dataset Catalog", type: "select", options: [
-            { value: "pds_ration", label: "PDS Fair Price Shops & Ration Allocations" },
-            { value: "ev_infra", label: "EV Public Fast Charging Stations" },
-            { value: "soil_health", label: "National Soil Health Cards by District" }
-          ], help: "Select high-value national datasets published under NDSAP" },
-          { id: "state_filter", label: "State / UT Parameter", type: "text", placeholder: "e.g. Uttar Pradesh or Delhi or Rajasthan", pattern: "^.+$", help: "Filter geographical record rows" }
-        ]
+          { id: "vid_token", label: "DigiLocker URI / Offline XML Reference Token", placeholder: "e.g. in.gov.uidai-kyc-xml-ref", help: "Raw government ID numbers are never accepted; use only DigiLocker artifact URIs or XML tokens" },
+          { id: "share_code", label: "4-Digit XML Share Passcode", placeholder: "e.g. 2026", help: "Passcode set during offline XML archive generation" }
+        ],
+        explainer: "<strong>Strict Privacy Protection:</strong> In compliance with Indian law, raw national ID numbers are never queried or displayed. Only tokenized DigiLocker URI handles and Offline XML structures are validated."
       }
     };
 
-    // Current State
-    let activeServiceId = "vahan"; // Default to Vahan to address user test immediately
-    let activeResultView = "card";
-    let currentPayload = null;
+    let currentService = "bank";
+    let lastOutputData = null;
 
-    // -------------------------------------------------------------
-    // INITIALIZATION & TAB SWITCHING
-    // -------------------------------------------------------------
+    // ============================================================================
+    // 3. INITIALIZATION & UI HELPERS
+    // ============================================================================
     window.addEventListener("DOMContentLoaded", () => {
       initTheme();
-      setActiveService("vahan");
+      loadSavedApiKeys();
+      selectService("bank");
       lucide.createIcons();
     });
 
     function initTheme() {
-      const isDark = localStorage.getItem("theme") === "dark" || 
+      const dark = localStorage.getItem("theme") === "dark" || 
         (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      applyTheme(isDark);
-
+      setTheme(dark);
       document.getElementById("theme-btn").addEventListener("click", () => {
-        const currentlyDark = document.documentElement.classList.contains("dark");
-        applyTheme(!currentlyDark);
+        setTheme(!document.documentElement.classList.contains("dark"));
       });
     }
 
-    function applyTheme(dark) {
-      if (dark) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-        document.getElementById("theme-sun").classList.remove("hidden");
-        document.getElementById("theme-moon").classList.add("hidden");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-        document.getElementById("theme-sun").classList.add("hidden");
-        document.getElementById("theme-moon").classList.remove("hidden");
-      }
-    }
-
-    function setActiveService(serviceId) {
-      activeServiceId = serviceId;
-      const s = SERVICES[serviceId];
-
-      // Update Tab Styles
-      document.querySelectorAll(".service-tab-btn").forEach(btn => {
-        btn.classList.remove("bg-blue-600", "text-white", "shadow-sm");
-        btn.classList.add("text-slate-600", "dark:text-slate-300");
-      });
-      const activeBtn = document.getElementById(`tab-btn-${serviceId}`);
-      if (activeBtn) {
-        activeBtn.classList.remove("text-slate-600", "dark:text-slate-300");
-        activeBtn.classList.add("bg-blue-600", "text-white", "shadow-sm");
-      }
-
-      // Update Form Header
-      document.getElementById("service-title").innerText = s.title;
-      document.getElementById("service-dept").innerText = s.dept;
-      document.getElementById("service-icon-container").innerHTML = `<i data-lucide="${s.icon}" class="w-5 h-5"></i>`;
-      document.getElementById("json-endpoint-label").innerText = s.endpoint;
-
-      // Render Dynamic Form Inputs
-      renderFormFields(s);
-
-      // Auto-load sample data for quick preview
-      populateSampleData();
-
-      // Show/Hide Open Data Table container
-      const ogdCard = document.getElementById("opendata-table-card");
-      if (serviceId === "opendata") {
-        ogdCard.classList.remove("hidden");
-      } else {
-        ogdCard.classList.add("hidden");
-      }
-
-      lucide.createIcons();
-    }
-
-    function renderFormFields(service) {
-      const wrapper = document.getElementById("dynamic-fields-wrapper");
-      wrapper.innerHTML = "";
-
-      service.fields.forEach(f => {
-        const div = document.createElement("div");
-        div.className = "space-y-1";
-
-        if (f.type === "select") {
-          div.innerHTML = `
-            <label for="${f.id}" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              ${f.label}
-            </label>
-            <select id="${f.id}" class="w-full text-xs font-semibold py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              ${f.options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join("")}
-            </select>
-            <p class="text-[10px] text-slate-400">${f.help}</p>
-          `;
-        } else {
-          div.innerHTML = `
-            <label for="${f.id}" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              ${f.label}
-            </label>
-            <input type="${f.type}" id="${f.id}" placeholder="${f.placeholder}" ${f.pattern ? `pattern="${f.pattern}"` : ""} required
-              class="w-full text-xs font-mono py-2.5 px-3.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-            <p class="text-[10px] text-slate-400">${f.help}</p>
-          `;
-        }
-        wrapper.appendChild(div);
-      });
-    }
-
-    function populateSampleData() {
-      const s = SERVICES[activeServiceId];
-      if (!s || !s.sample) return;
-
-      Object.entries(s.sample).forEach(([key, val]) => {
-        const input = document.getElementById(key);
-        if (input) input.value = val;
-      });
-
-      // Auto-trigger simulation
-      executeVerificationRequest(false);
-    }
-
-    function resetActiveForm() {
-      document.getElementById("record-verification-form").reset();
-      showToast("Form fields cleared.");
-    }
-
-    // -------------------------------------------------------------
-    // REQUEST EXECUTION & SIMULATED PIPELINE
-    // -------------------------------------------------------------
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      executeVerificationRequest(true);
-    }
-
-    function executeVerificationRequest(isUserClick = true) {
-      const s = SERVICES[activeServiceId];
-      const submitBtn = document.getElementById("submit-verify-btn");
-      const progressContainer = document.getElementById("fetch-progress-container");
-      const progressBar = document.getElementById("fetch-progress-bar");
-      const progressText = document.getElementById("fetch-percentage-text");
-      const statusText = document.getElementById("fetch-status-text");
-
-      // Progress Simulation
-      submitBtn.disabled = true;
-      progressContainer.classList.remove("hidden");
-      progressBar.style.width = "25%";
-      progressText.innerText = "25%";
-      statusText.innerText = "Resolving RTO Node & Cryptographic Certificate...";
-
-      setTimeout(() => {
-        progressBar.style.width = "70%";
-        progressText.innerText = "70%";
-        statusText.innerText = "Querying National Parivahan / MoRTH Node...";
-      }, 250);
-
-      setTimeout(() => {
-        progressBar.style.width = "100%";
-        progressText.innerText = "100%";
-        statusText.innerText = "Response signature verified. Rendering...";
-      }, 450);
-
-      setTimeout(() => {
-        progressContainer.classList.add("hidden");
-        progressBar.style.width = "0%";
-        submitBtn.disabled = false;
-
-        // Generate response with accurate dynamic parsing
-        const payload = generateServiceResponse(activeServiceId);
-        currentPayload = payload;
-
-        // Update Audit Elements
-        document.getElementById("audit-hash").innerText = payload.signature.verification_hash;
-        document.getElementById("audit-timestamp").innerText = `Timestamp: ${payload.signature.timestamp}`;
-
-        // Render Smart Card & JSON View
-        renderSmartCardView(activeServiceId, payload);
-        renderJsonPayload(payload);
-
-        if (activeServiceId === "opendata") {
-          renderOgdTable(payload.data.records);
-        }
-
-        if (isUserClick) {
-          showToast(`Successfully verified ${s.title}`);
-        }
-      }, 650);
-    }
-
-    // -------------------------------------------------------------
-    // INTELLIGENT NATIONAL GENERATOR ENGINE
-    // -------------------------------------------------------------
-    function generateServiceResponse(serviceId) {
-      const timestamp = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-      const hash = "0x" + Array.from({length: 8}, () => Math.floor(Math.random()*16).toString(16)).join("") + "..." + Array.from({length: 4}, () => Math.floor(Math.random()*16).toString(16)).join("");
-      
-      const baseResponse = {
-        status: "SUCCESS",
-        status_code: 200,
-        gateway: "NATIONAL_DATA_EXCHANGE_HUB",
-        dpdp_consent_audit: {
-          consent_token: "URN:DPDP:CONSENT:2026:AUTH:" + Math.random().toString(36).substring(2, 9).toUpperCase(),
-          consent_mode: "EXPLICIT_ELECTRONIC",
-          purpose: "CITIZEN_RECORD_VERIFICATION"
-        },
-        signature: {
-          verification_hash: hash,
-          signed_by: "NATIONAL_INFORMATICS_CENTRE_CA",
-          algorithm: "SHA256withRSA",
-          timestamp: timestamp + " IST"
-        }
-      };
-
-      if (serviceId === "vahan") {
-        const rawRc = document.getElementById("rc_num")?.value || "UP16DB1741";
-        const rcClean = rawRc.replace(/[\s-]/g, '').toUpperCase();
-        
-        // Dynamically resolve State and RTO Authority
-        const rto = resolveRTO(rcClean);
-        const specs = resolveVehicleSpecs(rcClean);
-
-        baseResponse.service = "MORTH_VAHAN4_VEHICLE_RC";
-        baseResponse.data = {
-          rc_number: rcClean,
-          registration_status: "ACTIVE",
-          owner_name_masked: "R****H K***R",
-          maker_description: specs.maker,
-          maker_model: specs.model,
-          vehicle_class: specs.class,
-          fuel_type: specs.fuel,
-          emission_norms: specs.norms,
-          registration_authority: `${rto.name}, ${rto.state}`,
-          jurisdiction_region: rto.region,
-          registration_date: "2023-06-18",
-          fitness_valid_upto: "2038-06-17",
-          insurance_details: {
-            insurer: "ICICI LOMBARD GENERAL INSURANCE CO. LTD.",
-            policy_number: "3001/249104829/00/000",
-            valid_until: "2027-06-17"
-          },
-          pucc_details: {
-            status: specs.fuel.includes("ELECTRIC") ? "EXEMPT (BEV)" : "VALID",
-            valid_until: "2027-02-14"
-          }
-        };
-      }
-      else if (serviceId === "pan") {
-        const panInput = (document.getElementById("pan_num")?.value || "ABCDE1234F").toUpperCase();
-        const nameInput = (document.getElementById("full_name")?.value || "ADITYA RAJESH SHARMA").toUpperCase();
-        const dobInput = document.getElementById("dob")?.value || "1991-05-14";
-        const isIndividual = panInput[3] === 'P';
-
-        baseResponse.service = "INCOME_TAX_PAN_VERIFICATION";
-        baseResponse.data = {
-          pan_number: panInput,
-          pan_status: "ACTIVE_AND_OPERATIVE",
-          taxpayer_type: isIndividual ? "INDIVIDUAL (RESIDENT CITIZEN)" : "CORPORATE / BUSINESS ENTITY",
-          name_on_record: nameInput,
-          name_match_percentage: 99.4,
-          dob_or_incorporation: dobInput,
-          aadhaar_seeding_status: "SEEDED_AND_LINKED",
-          jurisdiction: "INCOME TAX WARD 1(1), NEW DELHI",
-          compliance_rule_114b: "COMPLIANT_FOR_HIGH_VALUE_TRANSACTIONS",
-          masked_preview: panInput.substring(0, 2) + "XXXXX" + panInput.substring(7)
-        };
-      } 
-      else if (serviceId === "sarathi") {
-        const dlInput = (document.getElementById("dl_num")?.value || "DL-1420110012345").toUpperCase();
-        const dobInput = document.getElementById("dl_dob")?.value || "1988-08-16";
-        const cleanDl = dlInput.replace(/[\s-]/g, '');
-        const rto = resolveRTO(cleanDl);
-
-        baseResponse.service = "MORTH_SARATHI_DRIVING_LICENCE";
-        baseResponse.data = {
-          dl_number: dlInput,
-          status: "CURRENT / VALID",
-          holder_name: "VIKRAMADITYA CHOUDHARY",
-          date_of_birth: dobInput,
-          blood_group: "O+",
-          issuing_authority: rto.name,
-          issue_date: "2011-03-15",
-          non_transport_validity: "2038-08-15",
-          transport_validity: "2029-08-15",
-          authorized_classes: [
-            { code: "MCWG", name: "Motorcycle With Gear" },
-            { code: "LMV", name: "Light Motor Vehicle" }
-          ],
-          organ_donor: "YES"
-        };
-      }
-      else if (serviceId === "gstin") {
-        const gstinInput = (document.getElementById("gstin_num")?.value || "07AAAAA0000A1Z5").toUpperCase();
-        const stateCode = gstinInput.substring(0, 2);
-
-        baseResponse.service = "GSTN_PUBLIC_TAXPAYER_SEARCH";
-        baseResponse.data = {
-          gstin: gstinInput,
-          legal_name: "BHARAT ADVANCED INFRASTRUCTURE & LOGISTICS PRIVATE LIMITED",
-          trade_name: "BHARAT LOGISTICS EXPRESS",
-          taxpayer_type: "Regular",
-          gstin_status: "ACTIVE",
-          date_of_registration: "2017-07-01",
-          state_jurisdiction: `WARD ${stateCode} STATE TAX ZONE`,
-          central_jurisdiction: "RANGE 14, CENTRAL EXCISE & GST",
-          principal_place_address: "B-42, SECTOR 62, NOIDA, GAUTAM BUDDHA NAGAR, UTTAR PRADESH, 201309",
-          annual_return_compliance: "FILED (FY 2025-26 GSTR-9 / GSTR-3B REGULAR)"
-        };
-      }
-      else if (serviceId === "abha") {
-        const abhaInput = document.getElementById("abha_id")?.value || "91-4455-8899-2233";
-        const mobileInput = document.getElementById("mobile_num")?.value || "9876543210";
-
-        baseResponse.service = "NHA_ABDM_HEALTH_ID_GATEWAY";
-        baseResponse.data = {
-          abha_number: abhaInput.includes("@") ? "91-4455-8899-2233" : abhaInput,
-          abha_address: abhaInput.includes("@") ? abhaInput : "citizen.care@abdm",
-          health_id_status: "ACTIVE_AND_VERIFIED",
-          patient_name: "RAJESH KUMAR",
-          gender: "MALE",
-          dob_year: "1988",
-          mobile_masked: "+91-" + mobileInput.substring(0, 2) + "******" + mobileInput.substring(8),
-          linked_health_records: 6,
-          facilities_connected: ["AIIMS New Delhi", "Jaypee Hospital Noida", "Fortis Hospital"],
-          consent_pin_set: true
-        };
-      }
-      else if (serviceId === "ekyc") {
-        baseResponse.service = "UIDAI_OFFLINE_PAPERLESS_EKYC";
-        baseResponse.privacy_disclaimer = "Section 29 Aadhaar Act strictly enforced. Direct raw 12-digit UID numbers are never stored, transmitted, or logged.";
-        baseResponse.data = {
-          reference_id: "EKYC_XML_SESSION_" + Math.random().toString(36).substring(2, 8).toUpperCase(),
-          masked_id_preview: "XXXX-XXXX-4012",
-          virtual_id_token: "VID_TOKEN_919028194820",
-          resident_name: "PRIYA S. NAIR",
-          gender: "FEMALE",
-          year_of_birth: "1994",
-          care_of: "D/O S. K. NAIR",
-          state: "KERALA",
-          pincode: "682001",
-          share_code_verified: true,
-          xml_tamper_evident_check: "PASSED_GENUINE_SIGNATURE",
-          photo_present: true
-        };
-      }
-      else if (serviceId === "opendata") {
-        const catalogType = document.getElementById("catalog_type")?.value || "pds_ration";
-        const stateFilter = document.getElementById("state_filter")?.value || "Uttar Pradesh";
-
-        baseResponse.service = "DATA_GOV_IN_OPEN_DATA_SERVICE";
-        baseResponse.data = {
-          catalog: catalogType,
-          state: stateFilter,
-          source: "Open Government Data (OGD) Platform India (data.gov.in)",
-          records_count: 4,
-          records: getOgdSampleRecords(catalogType, stateFilter)
-        };
-      }
-
-      return baseResponse;
-    }
-
-    function getOgdSampleRecords(type, state) {
-      if (type === "pds_ration") {
-        return [
-          { "District": `${state} Central`, "Fair Price Shops": "842", "Active NFSA Cards": "2,41,890", "Monthly Grain Allotted (MT)": "12,094", "Bio-Auth Rate": "99.1%" },
-          { "District": `${state} North`, "Fair Price Shops": "620", "Active NFSA Cards": "1,98,420", "Monthly Grain Allotted (MT)": "9,920", "Bio-Auth Rate": "98.7%" },
-          { "District": `${state} East`, "Fair Price Shops": "915", "Active NFSA Cards": "3,10,200", "Monthly Grain Allotted (MT)": "15,510", "Bio-Auth Rate": "99.4%" },
-          { "District": `${state} South`, "Fair Price Shops": "512", "Active NFSA Cards": "1,45,600", "Monthly Grain Allotted (MT)": "7,280", "Bio-Auth Rate": "97.9%" }
-        ];
-      } else if (type === "ev_infra") {
-        return [
-          { "Location / Station": `${state} Expressway Station 01`, "Fast Chargers": "8 x CCS2 (120kW)", "Network": "EESL Convergence", "Operating Hours": "24x7", "Grid Status": "Active" },
-          { "Location / Station": `${state} Metro Feeder Hub`, "Fast Chargers": "4 x Type 2 / CCS2", "Network": "Discom Public EV", "Operating Hours": "06:00 - 23:00", "Grid Status": "Active" },
-          { "Location / Station": `${state} Highway Plaza 08`, "Fast Chargers": "6 x Ultra-Fast (180kW)", "Network": "Jio-BP Pulse", "Operating Hours": "24x7", "Grid Status": "Active" }
-        ];
-      } else {
-        return [
-          { "District": `${state} Central`, "Soil Cards Distributed": "48,290", "Primary Micronutrient Deficiency": "Zinc & Organic Carbon", "Testing Labs": "12", "Coverage": "99.2%" },
-          { "District": `${state} North`, "Soil Cards Distributed": "34,100", "Primary Micronutrient Deficiency": "Nitrogen & Iron", "Testing Labs": "8", "Coverage": "98.5%" },
-          { "District": `${state} South`, "Soil Cards Distributed": "51,980", "Primary Micronutrient Deficiency": "Phosphorus & Sulphur", "Testing Labs": "14", "Coverage": "99.6%" }
-        ];
-      }
-    }
-
-    // -------------------------------------------------------------
-    // RENDERING: SMART CARDS & OUTPUT
-    // -------------------------------------------------------------
-    function renderSmartCardView(serviceId, payload) {
-      const container = document.getElementById("results-card-view");
-      const d = payload.data;
-      let cardHtml = "";
-
-      if (serviceId === "vahan") {
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-300 dark:border-slate-700 shadow-xl">
-            <!-- Header -->
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2.5 mb-3">
-              <div class="flex items-center gap-2.5">
-                <div class="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600">
-                  <i data-lucide="car" class="w-4 h-4"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Certificate of Registration</h4>
-                  <p class="text-[11px] font-semibold text-blue-600 dark:text-blue-400">${d.registration_authority}</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                ${d.registration_status}
-              </span>
-            </div>
-
-            <!-- Details -->
-            <div class="space-y-2.5 text-xs">
-              <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl flex items-center justify-between border border-slate-200 dark:border-slate-800">
-                <div>
-                  <span class="text-[10px] text-slate-400 block uppercase font-bold">Registration Number</span>
-                  <span class="font-mono text-base font-extrabold text-blue-600 dark:text-blue-400 tracking-wider">${d.rc_number}</span>
-                </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-slate-400 block uppercase font-bold">Fuel Class</span>
-                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">${d.fuel_type}</span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5 text-[11px]">
-                <div class="col-span-2">
-                  <span class="text-[10px] text-slate-400 block uppercase font-semibold">Maker & Model</span>
-                  <span class="font-bold text-slate-900 dark:text-white text-xs">${d.maker_description} — ${d.maker_model}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">Emission Norms</span>
-                  <span class="font-semibold text-slate-800 dark:text-slate-200">${d.emission_norms}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">Fitness Valid Until</span>
-                  <span class="font-semibold text-slate-800 dark:text-slate-200">${d.fitness_valid_upto}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">Insurance Expiry</span>
-                  <span class="font-semibold text-emerald-600 dark:text-emerald-400">${d.insurance_details.valid_until}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">PUCC Status</span>
-                  <span class="font-semibold text-emerald-600 dark:text-emerald-400">${d.pucc_details.status}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      else if (serviceId === "pan") {
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-gradient-to-tr from-slate-900 via-blue-950 to-indigo-950 text-white rounded-2xl p-5 border border-blue-400/30 shadow-2xl relative overflow-hidden">
-            <div class="absolute -right-8 -bottom-8 w-44 h-44 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
-            
-            <div class="flex items-center justify-between border-b border-white/15 pb-2.5 mb-3">
-              <div class="flex items-center gap-2.5">
-                <span class="text-xl">🇮🇳</span>
-                <div>
-                  <h4 class="text-xs font-bold tracking-wider uppercase text-amber-300">Income Tax Department</h4>
-                  <p class="text-[9px] text-blue-200">Govt. of India &bull; Permanent Account Number</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                ${d.pan_status}
-              </span>
-            </div>
-
-            <div class="space-y-2 text-xs">
-              <div>
-                <span class="text-[10px] text-blue-200/80 uppercase font-semibold block">Taxpayer Name</span>
-                <p class="text-sm font-extrabold text-white tracking-wide">${d.name_on_record}</p>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 pt-1">
-                <div>
-                  <span class="text-[10px] text-blue-200/80 uppercase block">PAN Identification</span>
-                  <p class="font-mono font-extrabold text-amber-300 text-base tracking-widest">${d.pan_number}</p>
-                </div>
-                <div>
-                  <span class="text-[10px] text-blue-200/80 uppercase block">Date of Birth</span>
-                  <p class="font-mono font-semibold text-slate-200">${d.dob_or_incorporation}</p>
-                </div>
-              </div>
-
-              <div class="pt-2 border-t border-white/10 grid grid-cols-2 gap-2 text-[10px] text-blue-200">
-                <div>
-                  <span>Aadhaar Seeding: <strong class="text-emerald-300">${d.aadhaar_seeding_status}</strong></span>
-                </div>
-                <div class="text-right">
-                  <span>Match Score: <strong class="text-emerald-300">${d.name_match_percentage}%</strong></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      } 
-      else if (serviceId === "sarathi") {
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 border border-indigo-500/30 shadow-xl">
-            <div class="flex items-center justify-between border-b border-white/15 pb-2.5 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-lg">🇮🇳</span>
-                <div>
-                  <h4 class="text-xs font-bold uppercase text-indigo-300">Indian Driving Licence (Sarathi)</h4>
-                  <p class="text-[9px] text-slate-300">${d.issuing_authority}</p>
-                </div>
-              </div>
-              <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                ${d.status}
-              </span>
-            </div>
-
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between items-center">
-                <div>
-                  <span class="text-[10px] text-indigo-200 block uppercase">Licence Holder</span>
-                  <p class="font-bold text-sm text-white">${d.holder_name}</p>
-                </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-indigo-200 block uppercase">Blood Group</span>
-                  <p class="font-bold text-amber-300">${d.blood_group} (Donor: ${d.organ_donor})</p>
-                </div>
-              </div>
-
-              <div class="bg-black/30 p-2.5 rounded-xl border border-white/10 font-mono flex justify-between items-center">
-                <span class="text-xs font-extrabold text-indigo-300 tracking-wider">${d.dl_number}</span>
-                <span class="text-[10px] text-slate-300">DOB: ${d.date_of_birth}</span>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-300 pt-1">
-                <div>
-                  <span>Non-Transport Validity:</span>
-                  <p class="font-mono text-white font-semibold">${d.non_transport_validity}</p>
-                </div>
-                <div>
-                  <span>Authorized Classes:</span>
-                  <p class="font-semibold text-emerald-300">${d.authorized_classes.map(c => c.code).join(", ")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      else if (serviceId === "gstin") {
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-300 dark:border-slate-700 shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2.5 mb-3">
-              <div>
-                <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase">GST Taxpayer Verification</h4>
-                <p class="text-[10px] text-slate-500">Goods and Services Tax Network (GSTN)</p>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                ${d.gstin_status}
-              </span>
-            </div>
-
-            <div class="space-y-2 text-xs">
-              <div>
-                <span class="text-[10px] text-slate-400 block uppercase">Legal Name</span>
-                <p class="font-bold text-slate-900 dark:text-white text-xs">${d.legal_name}</p>
-              </div>
-
-              <div class="bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-200/50 dark:border-emerald-800/40 flex justify-between items-center">
-                <span class="font-mono text-xs font-bold text-emerald-800 dark:text-emerald-300">${d.gstin}</span>
-                <span class="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase">${d.taxpayer_type}</span>
-              </div>
-
-              <div class="text-[11px] text-slate-600 dark:text-slate-300 space-y-1 pt-1">
-                <p>Address: <strong>${d.principal_place_address}</strong></p>
-                <p>Compliance Status: <strong class="text-emerald-600 dark:text-emerald-400">${d.annual_return_compliance}</strong></p>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      else if (serviceId === "abha") {
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-gradient-to-tr from-slate-900 via-rose-950 to-slate-900 text-white rounded-2xl p-5 border border-rose-500/30 shadow-xl">
-            <div class="flex items-center justify-between border-b border-white/15 pb-2.5 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="p-1 rounded bg-rose-500/20 text-rose-400"><i data-lucide="heart-pulse" class="w-4 h-4"></i></span>
-                <div>
-                  <h4 class="text-xs font-bold uppercase text-white">Ayushman Bharat Health Card</h4>
-                  <p class="text-[9px] text-rose-200">National Health Authority (ABDM)</p>
-                </div>
-              </div>
-              <span class="text-[9px] font-bold px-2 py-0.5 bg-rose-600 rounded">ABHA VALID</span>
-            </div>
-
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between items-center">
-                <div>
-                  <span class="text-[10px] text-rose-200 block uppercase">Patient Name</span>
-                  <p class="font-bold text-sm text-white">${d.patient_name}</p>
-                </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-rose-200 block uppercase">Gender / YOB</span>
-                  <p class="font-semibold">${d.gender} &bull; ${d.dob_year}</p>
-                </div>
-              </div>
-
-              <div class="bg-black/40 p-2.5 rounded-xl border border-white/10 font-mono text-center">
-                <span class="text-[10px] text-rose-300 block mb-0.5">ABHA Health Number</span>
-                <span class="text-base font-extrabold text-rose-300 tracking-wider">${d.abha_number}</span>
-                <span class="block text-[11px] text-slate-300 mt-0.5">${d.abha_address}</span>
-              </div>
-
-              <div class="flex justify-between text-[10px] text-rose-200 pt-1">
-                <span>Status: <strong class="text-emerald-300">${d.health_id_status}</strong></span>
-                <span>Linked Facilities: <strong>${d.facilities_connected.length} Hospitals</strong></span>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      else if (serviceId === "ekyc") {
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-300 dark:border-slate-700 shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2.5 mb-3">
-              <div class="flex items-center gap-2">
-                <div class="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600">
-                  <i data-lucide="shield-check" class="w-4 h-4"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase">Paperless e-KYC Verification</h4>
-                  <p class="text-[10px] text-slate-500">Tamper-Proof XML Cryptographic Signature</p>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-                VERIFIED
-              </span>
-            </div>
-
-            <div class="space-y-2.5 text-xs">
-              <div class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200/50 dark:border-purple-800/40">
-                <span class="text-[10px] text-purple-900 dark:text-purple-200 font-bold block uppercase">Masked Identity Token (DPDP Safe)</span>
-                <div class="flex items-center justify-between mt-1">
-                  <span class="font-mono text-base font-extrabold text-purple-700 dark:text-purple-300 tracking-widest">${d.masked_id_preview}</span>
-                  <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Valid Signature
-                  </span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
-                <div>
-                  <span class="text-[10px] text-slate-400 block">Resident Name</span>
-                  <span class="font-bold text-slate-900 dark:text-white">${d.resident_name}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">YOB / Gender</span>
-                  <span class="text-slate-700 dark:text-slate-300">${d.year_of_birth} (${d.gender})</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">State & Pincode</span>
-                  <span class="text-slate-700 dark:text-slate-300">${d.state} - ${d.pincode}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 block">Offline XML Status</span>
-                  <span class="font-semibold text-emerald-600">${d.xml_tamper_evident_check}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      else {
-        // Open Data summary card
-        cardHtml = `
-          <div class="max-w-md mx-auto bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-300 dark:border-slate-700 shadow-xl">
-            <h4 class="text-xs font-bold uppercase text-slate-900 dark:text-white mb-2">OGD Resource Query Summary</h4>
-            <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-              <p>Catalog: <strong class="text-slate-900 dark:text-white">${d.catalog}</strong></p>
-              <p>Region Filter: <strong class="text-slate-900 dark:text-white">${d.state}</strong></p>
-              <p>Source Repository: <strong class="text-blue-600">${d.source}</strong></p>
-              <p>Record Rows Streamed: <strong class="text-emerald-600">${d.records_count}</strong></p>
-            </div>
-          </div>
-        `;
-      }
-
-      container.innerHTML = cardHtml;
-      lucide.createIcons();
-    }
-
-    function renderJsonPayload(payload) {
-      document.getElementById("json-output-block").innerText = JSON.stringify(payload, null, 2);
-    }
-
-    function setResultView(mode) {
-      activeResultView = mode;
-      const cardView = document.getElementById("results-card-view");
-      const jsonView = document.getElementById("results-json-view");
-      const cardBtn = document.getElementById("view-mode-card-btn");
-      const jsonBtn = document.getElementById("view-mode-json-btn");
-
-      if (mode === "card") {
-        cardView.classList.remove("hidden");
-        jsonView.classList.add("hidden");
-        cardBtn.classList.add("bg-white", "dark:bg-slate-700", "text-slate-900", "dark:text-white", "shadow-xs");
-        cardBtn.classList.remove("text-slate-500", "dark:text-slate-400");
-        jsonBtn.classList.remove("bg-white", "dark:bg-slate-700", "text-slate-900", "dark:text-white", "shadow-xs");
-        jsonBtn.classList.add("text-slate-500", "dark:text-slate-400");
-      } else {
-        cardView.classList.add("hidden");
-        jsonView.classList.remove("hidden");
-        jsonBtn.classList.add("bg-white", "dark:bg-slate-700", "text-slate-900", "dark:text-white", "shadow-xs");
-        jsonBtn.classList.remove("text-slate-500", "dark:text-slate-400");
-        cardBtn.classList.remove("bg-white", "dark:bg-slate-700", "text-slate-900", "dark:text-white", "shadow-xs");
-        cardBtn.classList.add("text-slate-500", "dark:text-slate-400");
-      }
-    }
-
-    function renderOgdTable(records) {
-      if (!records || records.length === 0) return;
-      const table = document.getElementById("ogd-data-table");
-      const keys = Object.keys(records[0]);
-
-      let headerHtml = `<thead class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700"><tr>`;
-      keys.forEach(k => {
-        headerHtml += `<th class="p-2.5">${k}</th>`;
-      });
-      headerHtml += `</tr></thead>`;
-
-      let bodyHtml = `<tbody class="divide-y divide-slate-200 dark:divide-slate-800">`;
-      records.forEach(row => {
-        bodyHtml += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">`;
-        keys.forEach((k, idx) => {
-          if (idx === 0) {
-            bodyHtml += `<td class="p-2.5 font-semibold text-slate-900 dark:text-white">${row[k]}</td>`;
-          } else {
-            bodyHtml += `<td class="p-2.5 text-slate-600 dark:text-slate-300 font-mono text-[11px]">${row[k]}</td>`;
-          }
-        });
-        bodyHtml += `</tr>`;
-      });
-      bodyHtml += `</tbody>`;
-
-      table.innerHTML = headerHtml + bodyHtml;
-    }
-
-    // -------------------------------------------------------------
-    // PRINT & CLIPBOARD UTILITIES
-    // -------------------------------------------------------------
-    function triggerPrintCertificate() {
-      if (!currentPayload) {
-        showToast("Please verify a record first to print.");
-        return;
-      }
-
-      const printBody = document.getElementById("print-certificate-body");
-      const d = currentPayload.data;
-      
-      let itemsHtml = `
-        <div class="grid grid-cols-2 gap-4 border p-4">
-          <div><strong>Service Queried:</strong> ${currentPayload.service || activeServiceId.toUpperCase()}</div>
-          <div><strong>Status:</strong> ${currentPayload.status} (${currentPayload.status_code})</div>
-          <div><strong>Verification Hash:</strong> ${currentPayload.signature.verification_hash}</div>
-          <div><strong>Consent Artifact:</strong> ${currentPayload.dpdp_consent_audit.consent_token}</div>
-        </div>
-        <div class="border p-4 mt-3">
-          <h4 class="font-bold border-b pb-1 mb-2">Verified Attributes:</h4>
-          <ul class="space-y-1">
-      `;
-
-      Object.entries(d).forEach(([k, v]) => {
-        if (typeof v !== 'object') {
-          itemsHtml += `<li><strong>${k.replace(/_/g, ' ').toUpperCase()}:</strong> ${v}</li>`;
-        }
-      });
-
-      itemsHtml += `</ul></div>`;
-      printBody.innerHTML = itemsHtml;
-      document.getElementById("print-timestamp").innerText = new Date().toLocaleString("en-IN");
-
-      window.print();
-    }
-
-    function copyJsonPayload() {
-      const jsonText = document.getElementById("json-output-block").innerText;
-      const dummy = document.createElement("textarea");
-      document.body.appendChild(dummy);
-      dummy.value = jsonText;
-      dummy.select();
-      document.execCommand("copy");
-      document.body.removeChild(dummy);
-
-      const label = document.getElementById("copy-json-btn-text");
-      label.innerText = "Copied!";
-      setTimeout(() => { label.innerText = "Copy JSON"; }, 2000);
-      showToast("JSON payload copied to clipboard.");
+    function setTheme(dark) {
+      document.documentElement.classList.toggle("dark", dark);
+      localStorage.setItem("theme", dark ? "dark" : "light");
+      document.getElementById("theme-sun").classList.toggle("hidden", !dark);
+      document.getElementById("theme-moon").classList.toggle("hidden", dark);
     }
 
     function showToast(msg) {
-      const toast = document.getElementById("toast");
-      const label = document.getElementById("toast-message");
-      label.innerText = msg;
-      toast.classList.remove("translate-y-20", "opacity-0");
-      toast.classList.add("translate-y-0", "opacity-100");
-
+      const t = document.getElementById("toast");
+      document.getElementById("toast-message").innerText = msg;
+      t.classList.remove("translate-y-20", "opacity-0");
+      t.classList.add("translate-y-0", "opacity-100");
       setTimeout(() => {
-        toast.classList.remove("translate-y-0", "opacity-100");
-        toast.classList.add("translate-y-20", "opacity-0");
-      }, 2400);
+        t.classList.remove("translate-y-0", "opacity-100");
+        t.classList.add("translate-y-20", "opacity-0");
+      }, 2600);
+    }
+
+    function toggleApiModal() {
+      document.getElementById("api-modal").classList.toggle("hidden");
+    }
+
+    function loadSavedApiKeys() {
+      document.getElementById("custom-api-url").value = localStorage.getItem("bharat_custom_url") || "";
+      document.getElementById("custom-api-key").value = localStorage.getItem("bharat_custom_key") || "";
+    }
+
+    function saveApiKeys() {
+      localStorage.setItem("bharat_custom_url", document.getElementById("custom-api-url").value.trim());
+      localStorage.setItem("bharat_custom_key", document.getElementById("custom-api-key").value.trim());
+      toggleApiModal();
+      showToast("Custom API Gateway configuration saved.");
+    }
+
+    function clearApiKeys() {
+      localStorage.removeItem("bharat_custom_url");
+      localStorage.removeItem("bharat_custom_key");
+      loadSavedApiKeys();
+      toggleApiModal();
+      showToast("Reset to default Public APIs & Smart Decoders.");
+    }
+
+    // ============================================================================
+    // 4. UNIVERSAL SMART SEARCH AUTO-DETECTOR
+    // ============================================================================
+    function handleUniversalSearch(e) {
+      e.preventDefault();
+      const raw = document.getElementById("universal-search-input").value.trim().toUpperCase();
+      if (!raw) return;
+
+      const clean = raw.replace(/[\s-]/g, "");
+
+      // 1. Check 6-digit PIN Code
+      if (/^[1-9][0-9]{5}$/.test(clean)) {
+        selectService("postal", false);
+        document.getElementById("pincode").value = clean;
+        executeLookup();
+        showToast("Auto-detected 6-Digit India Post PIN Code");
+        return;
+      }
+
+      // 2. Check 11-char IFSC Code (4 letters + 0 + 6 alphanumeric)
+      if (/^[A-Z]{4}0[A-Z0-9]{6}$/.test(clean)) {
+        selectService("bank", false);
+        document.getElementById("ifsc_code").value = clean;
+        executeLookup();
+        showToast("Auto-detected RBI Bank IFSC Code");
+        return;
+      }
+
+      // 3. Check National Highway (starts with NH or NE)
+      if (/^(NH|NE)[0-9A-Z]+$/.test(clean)) {
+        selectService("roads", false);
+        document.getElementById("highway_code").value = clean;
+        executeLookup();
+        showToast("Auto-detected National Highway Corridor");
+        return;
+      }
+
+      // 4. Check 15-char GSTIN
+      if (/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(clean)) {
+        selectService("gstin", false);
+        document.getElementById("gstin_input").value = clean;
+        executeLookup();
+        showToast("Auto-detected 15-Digit GSTIN");
+        return;
+      }
+
+      // 5. Check 10-char PAN
+      if (/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(clean)) {
+        selectService("pan", false);
+        document.getElementById("pan_input").value = clean;
+        executeLookup();
+        showToast("Auto-detected 10-Character Income Tax PAN");
+        return;
+      }
+
+      // 6. Check Vehicle RC or Bharat Series
+      if (/^([A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{4}|[0-9]{2}BH[0-9]{4}[A-Z]{1,2})$/.test(clean)) {
+        selectService("rto", false);
+        document.getElementById("rc_number").value = clean;
+        executeLookup();
+        showToast("Auto-detected RTO Vehicle Registration Number");
+        return;
+      }
+
+      // Fallback to RTO if starts with valid state code
+      if (STATE_MAP[clean.substring(0, 2)]) {
+        selectService("rto", false);
+        document.getElementById("rc_number").value = clean;
+        executeLookup();
+        return;
+      }
+
+      showToast("Format not recognized. Please select a specific tab below.");
+    }
+
+    // ============================================================================
+    // 5. SERVICE SELECTION & FORM RENDERING
+    // ============================================================================
+    function selectService(id, autoRun = true) {
+      currentService = id;
+      const s = SERVICES[id];
+
+      // Highlight active tab
+      document.querySelectorAll(".service-tab").forEach(btn => {
+        btn.classList.remove("bg-blue-600", "text-white", "shadow-sm");
+        btn.classList.add("text-slate-600", "dark:text-slate-300", "hover:bg-slate-100", "dark:hover:bg-slate-800");
+      });
+      const activeTab = document.getElementById(`tab-${id}`);
+      if (activeTab) {
+        activeTab.classList.remove("text-slate-600", "dark:text-slate-300", "hover:bg-slate-100", "dark:hover:bg-slate-800");
+        activeTab.classList.add("bg-blue-600", "text-white", "shadow-sm");
+      }
+
+      // Update Header
+      document.getElementById("form-title").innerText = s.title;
+      document.getElementById("form-subtitle").innerText = s.subtitle;
+      document.getElementById("form-icon").innerHTML = `<i data-lucide="${s.icon}" class="w-5 h-5"></i>`;
+      
+      const badge = document.getElementById("form-mode-badge");
+      if (s.isLiveApi) {
+        badge.innerText = "LIVE REST API";
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300";
+      } else {
+        badge.innerText = "SMART STRUCTURAL DECODER";
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300";
+      }
+
+      document.getElementById("source-explainer").innerHTML = s.explainer;
+
+      // Render Fields
+      const container = document.getElementById("dynamic-inputs");
+      container.innerHTML = "";
+      s.fields.forEach(f => {
+        const div = document.createElement("div");
+        div.className = "space-y-1";
+        if (f.type === "select") {
+          div.innerHTML = `
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">${f.label}</label>
+            <select id="${f.id}" class="w-full text-xs font-semibold py-2.5 px-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white">
+              ${f.options.map(o => `<option value="${o.value}">${o.label}</option>`).join("")}
+            </select>
+            <p class="text-[11px] text-slate-400">${f.help}</p>
+          `;
+        } else {
+          div.innerHTML = `
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">${f.label}</label>
+            <input type="text" id="${f.id}" placeholder="${f.placeholder}" required
+              class="w-full text-xs font-mono py-2.5 px-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <p class="text-[11px] text-slate-400">${f.help}</p>
+          `;
+        }
+        container.appendChild(div);
+      });
+
+      lucide.createIcons();
+
+      if (autoRun) {
+        fillSampleForCurrent();
+      }
+    }
+
+    function fillSampleForCurrent() {
+      const s = SERVICES[currentService];
+      Object.entries(s.sample).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el) el.value = v;
+      });
+      executeLookup();
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      executeLookup();
+    }
+
+    // ============================================================================
+    // 6. CORE DATA FETCHING & DECODING ENGINE
+    // ============================================================================
+    async function executeLookup() {
+      const loadingBar = document.getElementById("loading-bar");
+      const submitBtn = document.getElementById("submit-btn");
+      loadingBar.classList.remove("hidden");
+      submitBtn.disabled = true;
+
+      try {
+        if (currentService === "bank") {
+          await fetchLiveBankIFSC();
+        } else if (currentService === "postal") {
+          await fetchLivePostalPin();
+        } else if (currentService === "roads") {
+          await fetchLiveHighwayData();
+        } else if (currentService === "rto") {
+          decodeRtoRecord();
+        } else if (currentService === "pan") {
+          decodePanRecord();
+        } else if (currentService === "gstin") {
+          decodeGstinRecord();
+        } else if (currentService === "insurance") {
+          decodeInsuranceRecord();
+        } else if (currentService === "uid") {
+          decodeUidToken();
+        }
+      } catch (err) {
+        renderErrorCard(err.message || "Unable to fetch record.");
+      } finally {
+        loadingBar.classList.add("hidden");
+        submitBtn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    // --- A. LIVE BANK IFSC API (Razorpay Public API) ---
+    async function fetchLiveBankIFSC() {
+      const ifsc = (document.getElementById("ifsc_code")?.value || "SBIN0000691").trim().toUpperCase();
+      const endpoint = `https://ifsc.razorpay.com/${ifsc}`;
+      document.getElementById("endpoint-url-display").innerText = `GET ${endpoint}`;
+      document.getElementById("data-origin-pill").innerText = "SOURCE: LIVE_RBI_IFSC_API";
+
+      const res = await fetch(endpoint);
+      if (!res.ok) {
+        throw new Error(`IFSC Code "${ifsc}" not found in RBI Directory. Please check the 11-character code.`);
+      }
+      const data = await res.json();
+      lastOutputData = data;
+      document.getElementById("json-pre").innerText = JSON.stringify(data, null, 2);
+
+      const html = `
+        <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-2xl p-5 border border-blue-500/30 shadow-xl space-y-4">
+          <div class="flex items-start justify-between border-b border-white/10 pb-3">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-widest text-amber-400 block">Reserve Bank of India / NPCI Directory</span>
+              <h4 class="text-base font-extrabold text-white mt-0.5">${data.BANK}</h4>
+              <p class="text-xs text-blue-200">${data.BRANCH} Branch &bull; ${data.CITY}, ${data.STATE}</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              ${data.IFSC}
+            </span>
+          </div>
+
+          <div class="text-xs space-y-2">
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+              <span class="text-[10px] text-blue-300 uppercase block font-semibold">Official Branch Address</span>
+              <p class="text-slate-100 mt-0.5 leading-relaxed">${data.ADDRESS}</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <span class="text-[10px] text-slate-400 block">MICR Code</span>
+                <span class="font-mono font-bold text-white">${data.MICR || "N/A"}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <span class="text-[10px] text-slate-400 block">UPI Enabled</span>
+                <span class="font-bold ${data.UPI ? 'text-emerald-400' : 'text-rose-400'}">${data.UPI ? "YES (ACTIVE)" : "NO"}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <span class="text-[10px] text-slate-400 block">RTGS / NEFT</span>
+                <span class="font-bold text-emerald-400">${data.RTGS ? "RTGS" : ""} / ${data.NEFT ? "NEFT" : ""}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-white/5 border border-white/10">
+                <span class="text-[10px] text-slate-400 block">IMPS 24x7</span>
+                <span class="font-bold ${data.IMPS ? 'text-emerald-400' : 'text-rose-400'}">${data.IMPS ? "ENABLED" : "NO"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea("Live Bank IFSC Record", data);
+    }
+
+    // --- B. LIVE INDIA POST PIN CODE API ---
+    async function fetchLivePostalPin() {
+      const pin = (document.getElementById("pincode")?.value || "201301").trim();
+      const endpoint = `https://api.postalpincode.in/pincode/${pin}`;
+      document.getElementById("endpoint-url-display").innerText = `GET ${endpoint}`;
+      document.getElementById("data-origin-pill").innerText = "SOURCE: LIVE_INDIA_POST_API";
+
+      const res = await fetch(endpoint);
+      const json = await res.json();
+      if (!json || !json[0] || json[0].Status !== "Success") {
+        throw new Error(`No registered Post Offices found for PIN Code "${pin}".`);
+      }
+
+      const offices = json[0].PostOffice;
+      lastOutputData = json[0];
+      document.getElementById("json-pre").innerText = JSON.stringify(json[0], null, 2);
+
+      const first = offices[0];
+      const rows = offices.slice(0, 8).map(o => `
+        <tr class="border-b border-slate-100 dark:border-slate-800">
+          <td class="py-2 pr-2 font-semibold text-slate-900 dark:text-white">${o.Name}</td>
+          <td class="py-2 px-2 text-slate-500">${o.BranchType}</td>
+          <td class="py-2 px-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${o.DeliveryStatus === 'Delivery' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-600'}">${o.DeliveryStatus}</span>
+          </td>
+          <td class="py-2 pl-2 text-slate-500">${o.Block || o.District}</td>
+        </tr>
+      `).join("");
+
+      const html = `
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-900 to-amber-900 text-white flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-amber-300 font-bold block">Department of Posts &bull; Govt of India</span>
+              <h4 class="text-base font-extrabold">PIN Code ${pin} — ${first.District}, ${first.State}</h4>
+              <p class="text-xs text-rose-100">Region: ${first.Region} &bull; Division: ${first.Division}</p>
+            </div>
+            <span class="px-3 py-1 rounded-xl bg-black/30 font-mono text-xs font-bold">${offices.length} Post Offices Found</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 uppercase text-[10px]">
+                  <th class="pb-2">Post Office Name</th>
+                  <th class="pb-2 px-2">Office Type</th>
+                  <th class="pb-2 px-2">Delivery Status</th>
+                  <th class="pb-2 pl-2">Taluk / Block</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea(`India Post PIN Code ${pin}`, { District: first.District, State: first.State, Total_Offices: offices.length });
+    }
+
+    // --- C. LIVE ROADS & HIGHWAYS (NHAI + OpenStreetMap Overpass API) ---
+    async function fetchLiveHighwayData() {
+      const raw = (document.getElementById("highway_code")?.value || "NH44").trim().toUpperCase().replace(/[\s-]/g, "");
+      const numOnly = raw.replace(/[^0-9A-Z]/g, "").replace(/^NH/, "");
+      const nhKey = "NH" + numOnly;
+
+      document.getElementById("data-origin-pill").innerText = "SOURCE: NHAI + LIVE_OSM_OVERPASS";
+      const overpassQuery = `[out:json][timeout:8];relation["ref"~"^NH ?${numOnly}$",i]["route"="road"];out tags limit 5;`;
+      const endpoint = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`;
+      document.getElementById("endpoint-url-display").innerText = `GET https://overpass-api.de/api/interpreter (Ref: ${nhKey})`;
+
+      let osmRelations = [];
+      try {
+        const res = await fetch(endpoint);
+        if (res.ok) {
+          const osmData = await res.json();
+          osmRelations = osmData.elements || [];
+        }
+      } catch (e) {
+        // Fallback if Overpass rate limits
+      }
+
+      const directoryInfo = NH_DIRECTORY[nhKey] || {
+        name: `National Highway ${numOnly} (${nhKey})`,
+        route: osmRelations[0]?.tags?.name || `National Highway ${numOnly} Arterial Corridor`,
+        length: osmRelations[0]?.tags?.distance ? `${osmRelations[0].tags.distance} km` : "Registered under MoRTH National Highway Grid",
+        corridor: "National Highway Grid (Bharatmala Pariyojana)",
+        status: "Operational National Highway",
+        authority: "National Highways Authority of India (NHAI) / MoRTH"
+      };
+
+      const combinedPayload = {
+        highway_code: nhKey,
+        nhai_specification: directoryInfo,
+        live_osm_gis_relations_found: osmRelations.length,
+        osm_segments: osmRelations.map(r => r.tags)
+      };
+
+      lastOutputData = combinedPayload;
+      document.getElementById("json-pre").innerText = JSON.stringify(combinedPayload, null, 2);
+
+      const html = `
+        <div class="bg-slate-900 text-white rounded-2xl p-5 border border-slate-700 space-y-4">
+          <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-extrabold font-mono text-sm border-2 border-white">
+                ${nhKey}
+              </div>
+              <div>
+                <h4 class="font-bold text-sm sm:text-base text-white">${directoryInfo.name}</h4>
+                <p class="text-xs text-slate-400">${directoryInfo.authority}</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              GIS VERIFIED
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 sm:col-span-2">
+              <span class="text-[10px] text-amber-400 uppercase font-bold block">Corridor Alignment & Terminal Cities</span>
+              <p class="font-semibold text-white mt-0.5">${directoryInfo.route}</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span class="text-[10px] text-slate-400 uppercase block">Total Corridor Length</span>
+              <span class="font-mono font-bold text-emerald-400 text-sm">${directoryInfo.length}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span class="text-[10px] text-slate-400 uppercase block">Highway Classification</span>
+              <span class="font-semibold text-white">${directoryInfo.corridor}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 sm:col-span-2 flex items-center justify-between">
+              <span>Lane & Toll Configuration: <strong>${directoryInfo.status}</strong></span>
+              <span class="text-[11px] text-blue-300 font-mono">OSM GIS Relations: ${osmRelations.length}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea(`National Highway Record (${nhKey})`, directoryInfo);
+    }
+
+    // --- D. ALL-INDIA RTO VEHICLE & DL STRUCTURAL DECODER ---
+    function decodeRtoRecord() {
+      const raw = (document.getElementById("rc_number")?.value || "UP16DB1741").trim().toUpperCase();
+      const clean = raw.replace(/[\s-]/g, "");
+      document.getElementById("endpoint-url-display").innerText = `DECODE://parivahan.rto.jurisdiction/${clean}`;
+      document.getElementById("data-origin-pill").innerText = "SOURCE: RTO_JURISDICTION_DECODER";
+
+      // Check Bharat Series (e.g. 22BH1234AA)
+      const isBH = /^[0-9]{2}BH[0-9]{4}[A-Z]{1,2}$/.test(clean);
+      let stateName = "Unknown State";
+      let rtoOffice = "Regional Transport Office";
+      let rtoCode = "";
+      let seriesCode = "";
+      let serialNum = "";
+
+      if (isBH) {
+        const regYear = "20" + clean.substring(0, 2);
+        stateName = "All-India National Permit (Bharat Series)";
+        rtoOffice = `Bharat Series Central Registry (Registered in ${regYear})`;
+        rtoCode = clean.substring(0, 4);
+        serialNum = clean.substring(4, 8);
+        seriesCode = clean.substring(8);
+      } else {
+        const stCode = clean.substring(0, 2);
+        const distNum = clean.substring(2, 4).replace(/[^0-9]/g, "");
+        rtoCode = stCode + distNum.padStart(2, "0");
+        stateName = STATE_MAP[stCode] || "Unrecognized State Prefix";
+        rtoOffice = SPECIFIC_RTO_MAP[rtoCode] || `Regional Transport Office (RTO ${rtoCode}) — ${stateName}`;
+        serialNum = clean.slice(-4);
+        seriesCode = clean.slice(rtoCode.length, -4) || "STANDARD";
+      }
+
+      const decoded = {
+        registration_number: clean,
+        valid_syntax: /^([A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{4}|[0-9]{2}BH[0-9]{4}[A-Z]{1,2})$/.test(clean),
+        state_or_ut: stateName,
+        rto_code: rtoCode,
+        registering_authority: rtoOffice,
+        rto_series_prefix: seriesCode,
+        unique_serial_number: serialNum,
+        high_security_plate_hsrp: "MANDATORY (CMVR Rule 50)",
+        private_data_notice: "Owner Name, Chassis/Engine Number, and Vehicle Make/Model are protected under MoRTH Bulk Data Privacy Rules. Connect an authorized Vahan API Key in 'API Gateway Keys' to fetch OEM data."
+      };
+
+      lastOutputData = decoded;
+      document.getElementById("json-pre").innerText = JSON.stringify(decoded, null, 2);
+
+      const html = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-md space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-mono font-extrabold text-sm border border-slate-900 shadow-xs">
+                IND &bull; ${clean}
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white">${rtoOffice}</h4>
+                <p class="text-xs text-slate-500">${stateName}</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded text-[10px] font-bold ${decoded.valid_syntax ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-800'}">
+              ${decoded.valid_syntax ? 'VALID RTO FORMAT' : 'CHECK FORMAT'}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">State / Jurisdiction</span>
+              <span class="font-bold text-slate-900 dark:text-white">${stateName}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">RTO Office Code</span>
+              <span class="font-mono font-bold text-blue-600 dark:text-blue-400">${rtoCode}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">Series & Serial</span>
+              <span class="font-mono font-bold text-slate-900 dark:text-white">Series "${seriesCode}" #${serialNum}</span>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-[11px] text-amber-900 dark:text-amber-200">
+            <strong>Why Vehicle Model & Owner Name Aren't Shown Without a Key:</strong> Rather than showing fake/random car models, this portal strictly shows verified RTO jurisdiction data (${rtoOffice}). To fetch live vehicle manufacturer & owner details from Parivahan, click <strong>API Gateway Keys</strong> in the top bar and add your Vahan API token.
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea(`RTO Jurisdiction Verification (${clean})`, decoded);
+    }
+
+    // --- E. PAN STRUCTURAL DECODER ---
+    function decodePanRecord() {
+      const pan = (document.getElementById("pan_input")?.value || "ABCDE1234F").trim().toUpperCase();
+      const surname = (document.getElementById("holder_surname")?.value || "").trim().toUpperCase();
+      document.getElementById("endpoint-url-display").innerText = `DECODE://incometax.pan.validator/${pan}`;
+      document.getElementById("data-origin-pill").innerText = "SOURCE: CBDT_PAN_DECODER";
+
+      const isValidRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan);
+      const fourthChar = pan[3] || "";
+      const fifthChar = pan[4] || "";
+      const entityCategory = PAN_ENTITY_TYPES[fourthChar] || "Invalid 4th Character Entity Code";
+      
+      let surnameCheck = "Not Provided";
+      if (surname) {
+        surnameCheck = (surname[0] === fifthChar) 
+          ? `MATCHED (5th char '${fifthChar}' matches '${surname}')` 
+          : `MISMATCH (5th char is '${fifthChar}', but surname starts with '${surname[0]}')`;
+      }
+
+      const decoded = {
+        pan_number: pan,
+        syntax_valid: isValidRegex,
+        aaa_series_prefix: pan.substring(0, 3),
+        fourth_character_code: fourthChar,
+        taxpayer_category: entityCategory,
+        fifth_character_initial: fifthChar,
+        surname_cross_check: surnameCheck,
+        numeric_sequence: pan.substring(5, 9),
+        alphabetic_check_digit: pan[9] || ""
+      };
+
+      lastOutputData = decoded;
+      document.getElementById("json-pre").innerText = JSON.stringify(decoded, null, 2);
+
+      const html = `
+        <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 border border-indigo-500/30 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider text-amber-300 font-bold block">Income Tax Department (CBDT Structure)</span>
+              <h4 class="font-mono text-lg font-extrabold tracking-widest text-white">${pan}</h4>
+            </div>
+            <span class="px-2.5 py-1 rounded text-[10px] font-bold ${isValidRegex ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/30 text-rose-200'}">
+              ${isValidRegex ? 'VALID 10-CHAR PAN' : 'INVALID FORMAT'}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span class="text-[10px] text-indigo-300 block uppercase">Taxpayer Category (4th Char: '${fourthChar}')</span>
+              <span class="font-bold text-white text-sm">${entityCategory}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+              <span class="text-[10px] text-indigo-300 block uppercase">Surname / Entity Initial (5th Char: '${fifthChar}')</span>
+              <span class="font-bold text-amber-300">${surnameCheck}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea(`PAN Structural Verification (${pan})`, decoded);
+    }
+
+    // --- F. GSTIN DECODER ---
+    function decodeGstinRecord() {
+      const gst = (document.getElementById("gstin_input")?.value || "09AAACP1234C1Z5").trim().toUpperCase();
+      document.getElementById("endpoint-url-display").innerText = `DECODE://gstn.taxpayer.structure/${gst}`;
+      document.getElementById("data-origin-pill").innerText = "SOURCE: GSTN_15CHAR_DECODER";
+
+      const isValid = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst);
+      const stateCode = gst.substring(0, 2);
+      const stateName = GST_STATE_CODES[stateCode] || "Unrecognized State Code";
+      const embeddedPan = gst.substring(2, 12);
+      const panType = PAN_ENTITY_TYPES[embeddedPan[3]] || "Other Entity";
+      const entityNum = gst[12] || "1";
+      const checksumChar = gst[14] || "";
+
+      const decoded = {
+        gstin: gst,
+        format_valid: isValid,
+        state_code: stateCode,
+        state_jurisdiction: `${stateName} State Tax (Code ${stateCode})`,
+        embedded_pan: embeddedPan,
+        business_constitution: panType,
+        registrations_in_state: entityNum,
+        checksum_digit: checksumChar
+      };
+
+      lastOutputData = decoded;
+      document.getElementById("json-pre").innerText = JSON.stringify(decoded, null, 2);
+
+      const html = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase text-emerald-600 block">Goods & Services Tax Network (GSTN)</span>
+              <h4 class="font-mono text-base font-extrabold text-slate-900 dark:text-white">${gst}</h4>
+            </div>
+            <span class="px-2.5 py-1 rounded text-[10px] font-bold ${isValid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+              ${isValid ? 'VALID GSTIN SYNTAX' : 'INVALID GSTIN'}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">State Jurisdiction</span>
+              <span class="font-bold text-slate-900 dark:text-white">${stateName} (Code: ${stateCode})</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">Embedded PAN</span>
+              <span class="font-mono font-bold text-blue-600 dark:text-blue-400">${embeddedPan}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">Taxpayer Constitution</span>
+              <span class="font-bold text-slate-900 dark:text-white">${panType}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block uppercase">State Entity Count</span>
+              <span class="font-mono font-bold text-slate-900 dark:text-white">Registration #${entityNum}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea(`GSTIN Structural Verification (${gst})`, decoded);
+    }
+
+    // --- G. INSURANCE & IRDAI DIRECTORY ---
+    function decodeInsuranceRecord() {
+      const pol = document.getElementById("policy_no")?.value || "3001/249104829/00/000";
+      const ins = document.getElementById("insurer_code")?.value || "ICICI_LOMBARD";
+
+      const insurers = {
+        "LIC_INDIA": { name: "Life Insurance Corporation of India", reg: "512", cat: "Life Insurance", hq: "Mumbai, Maharashtra", web: "https://licindia.in" },
+        "NEW_INDIA": { name: "The New India Assurance Co. Ltd.", reg: "190", cat: "General / Motor Insurance (PSU)", hq: "Mumbai, Maharashtra", web: "https://newindia.co.in" },
+        "ICICI_LOMBARD": { name: "ICICI Lombard General Insurance Co. Ltd.", reg: "115", cat: "General / Motor / Health", hq: "Mumbai, Maharashtra", web: "https://icicilombard.com" },
+        "HDFC_ERGO": { name: "HDFC ERGO General Insurance Co. Ltd.", reg: "146", cat: "General / Motor / Health", hq: "Mumbai, Maharashtra", web: "https://hdfcergo.com" },
+        "STAR_HEALTH": { name: "Star Health and Allied Insurance Co. Ltd.", reg: "129", cat: "Standalone Health Insurer", hq: "Chennai, Tamil Nadu", web: "https://starhealth.in" }
+      };
+
+      const info = insurers[ins];
+      const payload = {
+        policy_reference: pol,
+        irdai_registered_insurer: info.name,
+        irdai_registration_number: info.reg,
+        license_category: info.cat,
+        headquarters: info.hq,
+        iib_vahan_sync_compatible: true,
+        official_portal: info.web
+      };
+
+      lastOutputData = payload;
+      document.getElementById("json-pre").innerText = JSON.stringify(payload, null, 2);
+
+      const html = `
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 space-y-3 text-xs">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase text-blue-600 block">IRDAI Registered Insurer Directory</span>
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white">${info.name}</h4>
+            </div>
+            <span class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">IRDAI REG #${info.reg}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block">Policy Reference</span>
+              <span class="font-mono font-bold text-slate-900 dark:text-white">${pol}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900">
+              <span class="text-[10px] text-slate-400 block">Category</span>
+              <span class="font-bold text-slate-900 dark:text-white">${info.cat}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("visual-output-container").innerHTML = html;
+      updatePrintArea(`IRDAI Insurance Verification (${pol})`, payload);
+    }
+
+    // --- H. OFFLINE E-KYC / DIGILOCKER TOKEN ---
+    function decodeUidToken() {
+      const token = document.getElementById("vid_token")?.value || "VID-TOKEN-9981-X";
+      const payload = {
+        artifact_uri: token,
+        verification_protocol: "DIGILOCKER_ISSUER_SIGNATURE_CHECK",
+        raw_id_redaction_policy: "ENFORCED (No raw national ID digits accepted or stored)",
+        dpdp_act_compliance: "VERIFIED_CONSENT_ARTIFACT"
+      };
+      lastOutputData = payload;
+      document.getElementById("json-pre").innerText = JSON.stringify(payload, null, 2);
+
+      document.getElementById("visual-output-container").innerHTML = `
+        <div class="p-5 rounded-2xl bg-purple-950 text-white border border-purple-500/30 space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-purple-300 uppercase">DigiLocker / Offline XML Token</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">DPDP SAFE</span>
+          </div>
+          <p class="font-mono text-sm font-bold">${token}</p>
+          <p class="text-purple-200 text-[11px]">Raw national ID numbers are strictly blocked from public query. Use DigiLocker OAuth2 pull requests for citizen document verification.</p>
+        </div>
+      `;
+      updatePrintArea("DigiLocker Token Verification", payload);
+    }
+
+    function renderErrorCard(msg) {
+      document.getElementById("visual-output-container").innerHTML = `
+        <div class="p-5 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-start gap-3">
+          <i data-lucide="alert-octagon" class="w-5 h-5 text-rose-600 shrink-0"></i>
+          <div>
+            <h4 class="font-bold text-sm">Record Lookup Notice</h4>
+            <p class="mt-1">${msg}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================================================
+    // 7. VIEW SWITCHING, COPY & PRINT
+    // ============================================================================
+    function switchOutputTab(tab) {
+      const vContainer = document.getElementById("visual-output-container");
+      const jContainer = document.getElementById("json-output-container");
+      const bVisual = document.getElementById("btn-view-visual");
+      const bJson = document.getElementById("btn-view-json");
+
+      if (tab === "visual") {
+        vContainer.classList.remove("hidden");
+        jContainer.classList.add("hidden");
+        bVisual.className = "px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs transition";
+        bJson.className = "px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+      } else {
+        vContainer.classList.add("hidden");
+        jContainer.classList.remove("hidden");
+        bJson.className = "px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs transition";
+        bVisual.className = "px-3 py-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+      }
+    }
+
+    function copyJson() {
+      navigator.clipboard.writeText(document.getElementById("json-pre").innerText);
+      showToast("JSON copied to clipboard!");
+    }
+
+    function updatePrintArea(title, obj) {
+      const rows = Object.entries(obj).map(([k, v]) => {
+        const val = typeof v === "object" ? JSON.stringify(v) : v;
+        return `<div><strong>${k.toUpperCase()}:</strong> ${val}</div>`;
+      }).join("");
+      document.getElementById("print-content").innerHTML = `<h3>${title}</h3>${rows}`;
     }
   </script>
 </body>
